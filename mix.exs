@@ -1,11 +1,11 @@
-defmodule Inertia.MixProject do
+defmodule Combo.Inertia.MixProject do
   use Mix.Project
 
   @version "2.5.1"
 
   def project do
     [
-      app: :inertia,
+      app: :combo_inertia,
       version: @version,
       elixir: ">= 1.14.0",
       elixirc_paths: elixirc_paths(Mix.env()),

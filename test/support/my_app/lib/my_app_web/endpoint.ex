@@ -1,5 +1,5 @@
 defmodule MyAppWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :inertia
+  use Phoenix.Endpoint, otp_app: :combo_inertia
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -17,7 +17,7 @@ defmodule MyAppWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: :inertia,
+    from: :combo_inertia,
     gzip: false,
     only: MyAppWeb.static_paths()
 

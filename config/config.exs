@@ -1,6 +1,6 @@
 import Config
 
-config :inertia, MyAppWeb.Endpoint,
+config :combo_inertia, MyAppWeb.Endpoint,
   url: [host: "localhost"],
   cache_static_manifest: "priv/static/cache_manifest.json",
   render_errors: [
