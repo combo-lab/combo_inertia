@@ -702,7 +702,7 @@ As configured, this will place the generated `ssr.js` bundle into the `priv` dir
 
 Now that you have a Node.js module capable of server-rendering your pages, youll need to tell the Inertia.js Phoenix library to perform SSR.
 
-First, add the `Inertia.SSR` module to your application's supervision tree.
+First, add the `Combo.Inertia.SSR` module to your application's supervision tree.
 
 ```diff
   # lib/my_app/application.ex
@@ -724,7 +724,7 @@ First, add the `Inertia.SSR` module to your application's supervision tree.
 
 +       # Start the SSR process pool
 +       # You must specify a `path` option to locate the directory where the `ssr.js` file lives.
-+       {Inertia.SSR, path: Path.join([Application.app_dir(:my_app), "priv"])},
++       {Combo.Inertia.SSR, path: Path.join([Application.app_dir(:my_app), "priv"])},
 
         # Start to serve requests, typically the last entry
         MyAppWeb.Endpoint,

@@ -1,4 +1,4 @@
-defmodule Inertia.SSR do
+defmodule Combo.Inertia.SSR do
   @moduledoc """
   A supervisor that provides SSR support for Inertia views. This module is
   responsible for starting a pool of Node.js processes that can run the SSR
@@ -9,7 +9,7 @@ defmodule Inertia.SSR do
 
   require Logger
 
-  alias Inertia.SSR.Config
+  alias Combo.Inertia.SSR.Config
 
   @default_pool_size 4
   @default_module "ssr"

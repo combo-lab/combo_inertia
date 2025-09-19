@@ -6,8 +6,8 @@ defmodule Combo.Inertia.Conn do
   require Logger
 
   alias Combo.Inertia.Errors
-  alias Inertia.SSR.RenderError
-  alias Inertia.SSR
+  alias Combo.Inertia.SSR.RenderError
+  alias Combo.Inertia.SSR
 
   import Phoenix.Controller
   import Plug.Conn

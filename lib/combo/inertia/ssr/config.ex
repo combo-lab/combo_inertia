@@ -1,4 +1,4 @@
-defmodule Inertia.SSR.Config do
+defmodule Combo.Inertia.SSR.Config do
   @moduledoc false
 
   use GenServer

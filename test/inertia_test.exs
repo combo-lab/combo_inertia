@@ -84,7 +84,7 @@ defmodule InertiaTest do
       |> Path.dirname()
       |> Path.join("js")
 
-    start_supervised({Inertia.SSR, path: path})
+    start_supervised({Combo.Inertia.SSR, path: path})
 
     Application.put_env(:inertia, :ssr, true)
 
@@ -105,7 +105,7 @@ defmodule InertiaTest do
       |> Path.dirname()
       |> Path.join("js")
 
-    start_supervised({Inertia.SSR, path: path})
+    start_supervised({Combo.Inertia.SSR, path: path})
 
     Application.put_env(:inertia, :ssr, false)
 
@@ -126,7 +126,7 @@ defmodule InertiaTest do
       |> Path.dirname()
       |> Path.join("js")
 
-    start_supervised({Inertia.SSR, path: path})
+    start_supervised({Combo.Inertia.SSR, path: path})
 
     Application.put_env(:inertia, :ssr, true)
 
@@ -148,7 +148,7 @@ defmodule InertiaTest do
       |> Path.dirname()
       |> Path.join("js")
 
-    start_supervised({Inertia.SSR, path: path, module: "ssr-failure"})
+    start_supervised({Combo.Inertia.SSR, path: path, module: "ssr-failure"})
 
     Application.put_env(:inertia, :ssr, true)
     Application.put_env(:inertia, :raise_on_ssr_failure, false)
@@ -167,12 +167,12 @@ defmodule InertiaTest do
       |> Path.dirname()
       |> Path.join("js")
 
-    start_supervised({Inertia.SSR, path: path, module: "ssr-failure"})
+    start_supervised({Combo.Inertia.SSR, path: path, module: "ssr-failure"})
 
     Application.put_env(:inertia, :ssr, true)
     Application.put_env(:inertia, :raise_on_ssr_failure, true)
 
-    assert_raise(Inertia.SSR.RenderError, fn ->
+    assert_raise(Combo.Inertia.SSR.RenderError, fn ->
       conn
       |> get(~p"/")
     end)
