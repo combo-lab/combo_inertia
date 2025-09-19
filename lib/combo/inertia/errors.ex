@@ -1,4 +1,4 @@
-defprotocol Inertia.Errors do
+defprotocol Combo.Inertia.Errors do
   @moduledoc ~S"""
   Converts a value to Inertia.js-compatible [validation
   errors](https://inertiajs.com/validation).
@@ -35,7 +35,7 @@ defprotocol Inertia.Errors do
   ```
 
   The `assign_errors/2` function is a convenience helper provided by `Combo.Inertia.Conn`
-  that internally uses `Inertia.Errors.to_errors/1` to serialize the changeset errors
+  that internally uses `Combo.Inertia.Errors.to_errors/1` to serialize the changeset errors
   and share them with the Inertia page under the `errors` key.
 
   ## Custom Error Formatting
@@ -44,7 +44,7 @@ defprotocol Inertia.Errors do
   `to_errors/2`:
 
   ```elixir
-  Inertia.Errors.to_errors(changeset, fn {msg, opts} ->
+  Combo.Inertia.Errors.to_errors(changeset, fn {msg, opts} ->
     # Custom error message formatting logic
     Gettext.dgettext(MyApp.Gettext, "errors", msg, opts)
   end)
@@ -55,7 +55,7 @@ defprotocol Inertia.Errors do
   You can implement this protocol for your own error types:
 
   ```elixir
-  defimpl Inertia.Errors, for: MyApp.ValidationError do
+  defimpl Combo.Inertia.Errors, for: MyApp.ValidationError do
     def to_errors(validation_error) do
       # Convert your custom error structure to a map of field paths to error
       # messages
@@ -79,7 +79,7 @@ defprotocol Inertia.Errors do
   def to_errors(value, msg_func)
 end
 
-defimpl Inertia.Errors, for: Ecto.Changeset do
+defimpl Combo.Inertia.Errors, for: Ecto.Changeset do
   def to_errors(%Ecto.Changeset{} = changeset) do
     to_errors(changeset, &default_msg_func/1)
   end
@@ -129,7 +129,7 @@ defimpl Inertia.Errors, for: Ecto.Changeset do
   end
 end
 
-defimpl Inertia.Errors, for: Map do
+defimpl Combo.Inertia.Errors, for: Map do
   def to_errors(value) do
     validate_error_map!(value)
   end

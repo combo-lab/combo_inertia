@@ -1,7 +1,7 @@
-defmodule Inertia.ErrorsTest do
+defmodule Combo.Inertia.ErrorsTest do
   use ExUnit.Case, async: true
 
-  alias Inertia.Errors
+  alias Combo.Inertia.Errors
   alias Ecto.Changeset
 
   describe "to_errors/1 for Map" do

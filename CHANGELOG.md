@@ -33,7 +33,7 @@
 
 ### Changed
 
-- Define an `Inertia.Errors` protocol with default implementations for `Ecto.Changeset` and `Map`.
+- Define an `Combo.Inertia.Errors` protocol with default implementations for `Ecto.Changeset` and `Map`.
 
 ## 2.2.0
 

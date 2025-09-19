@@ -5,7 +5,7 @@ defmodule Combo.Inertia.Conn do
 
   require Logger
 
-  alias Inertia.Errors
+  alias Combo.Inertia.Errors
   alias Inertia.SSR.RenderError
   alias Inertia.SSR
 
@@ -212,7 +212,7 @@ defmodule Combo.Inertia.Conn do
 
   @doc """
   Assigns errors to the Inertia page data. This helper accepts any data that
-  implements the `Inertia.Errors` protocol. By default, this library implements
+  implements the `Combo.Inertia.Errors` protocol. By default, this library implements
   error serializers for `Ecto.Changeset` and bare maps.
 
   If you are serializing your own errors maps, they should take the following shape:
