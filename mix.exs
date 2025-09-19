@@ -31,15 +31,11 @@ defmodule Inertia.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:phx_new, "~> 1.0", only: [:test]},
       {:phoenix, "~> 1.7"},
       {:phoenix_html, ">= 3.0.0"},
       {:phoenix_live_view, "~> 1.0"},
       {:plug, ">= 1.5.0 and < 2.0.0"},
       {:jason, "~> 1.2"},
-      {:bandit, "~> 1.2", only: :test},
-      {:phoenix_view, "~> 2.0", only: :test},
-      {:plug_cowboy, "~> 2.1", only: :test},
       {:floki, ">= 0.30.0", only: :test},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
