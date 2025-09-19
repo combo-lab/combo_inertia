@@ -81,7 +81,7 @@ if Code.ensure_loaded?(Igniter) do
     @doc false
     def setup_controller_helpers(igniter) do
       update_web_ex_helper(igniter, :controller, fn zipper ->
-        import_code = "import Inertia.Controller"
+        import_code = "import Combo.Inertia.Conn"
 
         with {:ok, zipper} <- move_to_last_import(zipper) do
           {:ok, Igniter.Code.Common.add_code(zipper, import_code)}

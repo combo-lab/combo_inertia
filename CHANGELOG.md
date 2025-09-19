@@ -40,7 +40,7 @@
 ### Added
 
 - Add `preserve_case` helper to prevent auto-camelization of specified prop keys.
-- Add `Inertia.Controller.inertia_response?/1` helper to determine if a response is Inertia-rendered.
+- Add `Combo.Inertia.Conn.inertia_response?/1` helper to determine if a response is Inertia-rendered.
 
 ### Fixed
 
@@ -140,7 +140,7 @@ Now, the serializer simply takes the _first error message_ and returns it under 
 - Assign errors via an `assign_errors` helper ([#10](https://github.com/inertiajs/inertia-phoenix/issues/10))
 - Preserve assigned errors across redirects ([#10](https://github.com/inertiajs/inertia-phoenix/issues/10))
 - Set up external redirects properly for Inertia requests ([#11](https://github.com/inertiajs/inertia-phoenix/issues/11))
-- Pass CSRF tokens via cookies ([#12](https://github.com/inertiajs/inertia-phoenix/issues/12)) 
+- Pass CSRF tokens via cookies ([#12](https://github.com/inertiajs/inertia-phoenix/issues/12))
 - Forward flash contents across forced refreshes ([#13](https://github.com/inertiajs/inertia-phoenix/issues/13))
 - Automatically pass Phoenix flash data via the `flash` prop
 

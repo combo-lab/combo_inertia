@@ -43,7 +43,7 @@ defmodule MyAppWeb do
         layouts: [html: MyAppWeb.Layouts]
 
       import Plug.Conn
-      import Inertia.Controller
+      import Combo.Inertia.Conn
 
       unquote(verified_routes())
     end

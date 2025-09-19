@@ -14,10 +14,10 @@ defmodule InertiaTest do
 
   test "checking if a response is Inertia-rendered", %{conn: conn} do
     conn = get(conn, "/")
-    assert Inertia.Controller.inertia_response?(conn)
+    assert Combo.Inertia.Conn.inertia_response?(conn)
 
     conn = conn |> recycle() |> get("/non_inertia")
-    refute Inertia.Controller.inertia_response?(conn)
+    refute Combo.Inertia.Conn.inertia_response?(conn)
   end
 
   test "renders JSON response with x-inertia header", %{conn: conn} do

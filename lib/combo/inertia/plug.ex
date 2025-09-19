@@ -3,7 +3,7 @@ defmodule Inertia.Plug do
   The plug module for detecting Inertia.js requests.
   """
 
-  import Inertia.Controller, only: [assign_errors: 2]
+  import Combo.Inertia.Conn, only: [assign_errors: 2]
   import Plug.Conn
 
   def init(opts) do

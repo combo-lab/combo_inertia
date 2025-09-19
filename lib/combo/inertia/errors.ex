@@ -34,7 +34,7 @@ defprotocol Inertia.Errors do
   end
   ```
 
-  The `assign_errors/2` function is a convenience helper provided by `Inertia.Controller`
+  The `assign_errors/2` function is a convenience helper provided by `Combo.Inertia.Conn`
   that internally uses `Inertia.Errors.to_errors/1` to serialize the changeset errors
   and share them with the Inertia page under the `errors` key.
 

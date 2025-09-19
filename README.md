@@ -96,10 +96,10 @@ config :inertia,
 This library includes a few modules to help render Inertia responses:
 
 - [`Inertia.Plug`](https://hexdocs.pm/inertia/Inertia.Plug.html): a plug for detecting Inertia.js requests and preparing the connection accordingly.
-- [`Inertia.Controller`](https://hexdocs.pm/inertia/Inertia.Controller.html): controller functions for rendering Inertia.js-compatible responses.
+- [`Combo.Inertia.Conn`](https://hexdocs.pm/inertia/Combo.Inertia.Conn.html): controller functions for rendering Inertia.js-compatible responses.
 - [`Inertia.HTML`](https://hexdocs.pm/inertia/Inertia.HTML.html): HTML components for Inertia-powered views.
 
-To get started, import `Inertia.Controller` in your controller helper and `Inertia.HTML` in your html helper:
+To get started, import `Combo.Inertia.Conn` in your controller helper and `Inertia.HTML` in your html helper:
 
 ```diff
   # lib/my_app_web.ex
@@ -108,7 +108,7 @@ To get started, import `Inertia.Controller` in your controller helper and `Inert
       quote do
         use Phoenix.Controller, namespace: MyAppWeb
 
-+       import Inertia.Controller
++       import Combo.Inertia.Conn
       end
     end
 
@@ -211,22 +211,22 @@ Replace the contents of your `app.js` file with the Inertia boot function and re
 ```javascript
 // assets/js/app.jsx
 
-import React from "react";
-import axios from "axios";
+import React from "react"
+import axios from "axios"
 
-import { createInertiaApp } from "@inertiajs/react";
-import { createRoot } from "react-dom/client";
+import { createInertiaApp } from "@inertiajs/react"
+import { createRoot } from "react-dom/client"
 
-axios.defaults.xsrfHeaderName = "x-csrf-token";
+axios.defaults.xsrfHeaderName = "x-csrf-token"
 
 createInertiaApp({
   resolve: async (name) => {
-    return await import(`./pages/${name}.jsx`);
+    return await import(`./pages/${name}.jsx`)
   },
   setup({ App, el, props }) {
-    createRoot(el).render(<App {...props} />);
+    createRoot(el).render(<App {...props} />)
   },
-});
+})
 ```
 
 The example above assumes your pages live in the `assets/js/pages` directory and have a default export with page component, like this:
@@ -234,17 +234,13 @@ The example above assumes your pages live in the `assets/js/pages` directory and
 ```javascript
 // assets/js/pages/Dashboard.jsx
 
-import React from "react";
+import React from "react"
 
 const Dashboard = () => {
-  return (
-    <div>
-      {/* ... page contents ...*/}
-    </div>
-  );
+  return <div>{/* ... page contents ...*/}</div>
 }
 
-export default Dashboard;
+export default Dashboard
 ```
 
 Next, make some adjustments to your esbuild config:
@@ -302,10 +298,9 @@ After that, we need to update our root layout to load the JavaScript bundle as a
 
 ## Lazy data evaluation
 
-If you have expensive data for your props that may not always be required (that is, if you plan to use [partial reloads](https://inertiajs.com/partial-reloads)), you can wrap your expensive computation in a function and pass the function reference when setting your Inertia props. You may use either an anonymous function (or named function reference) and optionally wrap it with the `Inertia.Controller.inertia_optional/1` function.
+If you have expensive data for your props that may not always be required (that is, if you plan to use [partial reloads](https://inertiajs.com/partial-reloads)), you can wrap your expensive computation in a function and pass the function reference when setting your Inertia props. You may use either an anonymous function (or named function reference) and optionally wrap it with the `Combo.Inertia.Conn.inertia_optional/1` function.
 
-> [!NOTE]
-> `inertia_optional` props will _only_ be included the when explicitly requested in a partial
+> [!NOTE] > `inertia_optional` props will _only_ be included the when explicitly requested in a partial
 > reload. If you want to include the prop on first visit, you'll want to use a
 > bare anonymous function or named function reference instead. See below for
 > examples of how prop assignment behaves.
@@ -382,7 +377,7 @@ To share data on every request, you can use the `assign_prop/2` function inside 
 
 ```elixir
 defmodule MyApp.UserAuth do
-  import Inertia.Controller
+  import Combo.Inertia.Conn
   import Phoenix.Controller
   import Plug.Conn
 
@@ -495,8 +490,8 @@ This library automatically sets the `XSRF-TOKEN` cookie for use by the Axios cli
 ```javascript
 // assets/js/app.js
 
-import axios from "axios";
-axios.defaults.xsrfHeaderName = "x-csrf-token";
+import axios from "axios"
+axios.defaults.xsrfHeaderName = "x-csrf-token"
 
 // the rest of your Inertia client code...
 ```
@@ -533,7 +528,6 @@ conn
 ## Testing
 
 The `Inertia.Testing` module includes helpers for testing your Inertia controller responses, such as the `inertia_component/1` and `inertia_props/1` functions.
-
 
 ```elixir
 use MyAppWeb.ConnCase
@@ -597,18 +591,18 @@ Suppose your main `app.jsx` file looks something like this:
 ```js
 // assets/js/app.jsx
 
-import React from "react";
-import { createInertiaApp } from "@inertiajs/react";
-import { createRoot } from "react-dom/client";
+import React from "react"
+import { createInertiaApp } from "@inertiajs/react"
+import { createRoot } from "react-dom/client"
 
 createInertiaApp({
   resolve: async (name) => {
-    return await import(`./pages/${name}.jsx`);
+    return await import(`./pages/${name}.jsx`)
   },
   setup({ App, el, props }) {
-    createRoot(el).render(<App {...props} />);
+    createRoot(el).render(<App {...props} />)
   },
-});
+})
 ```
 
 You'll need to create a second JavaScript file (alongside your `app.jsx`) that exports a `render` function. Let's name it `ssr.jsx`.
@@ -616,19 +610,19 @@ You'll need to create a second JavaScript file (alongside your `app.jsx`) that e
 ```js
 // assets/js/ssr.jsx
 
-import React from "react";
-import ReactDOMServer from "react-dom/server";
-import { createInertiaApp } from "@inertiajs/react";
+import React from "react"
+import ReactDOMServer from "react-dom/server"
+import { createInertiaApp } from "@inertiajs/react"
 
 export function render(page) {
   return createInertiaApp({
     page,
     render: ReactDOMServer.renderToString,
     resolve: async (name) => {
-      return await import(`./pages/${name}.jsx`);
+      return await import(`./pages/${name}.jsx`)
     },
     setup: ({ App, props }) => <App {...props} />,
-  });
+  })
 }
 ```
 
@@ -799,8 +793,7 @@ If you haven't installed node into your runner image, add the following command 
 + ENV NODE_ENV="production"
 ```
 
-> [!IMPORTANT]
-> **Be sure to set `NODE_ENV=production`**, so that the SSR script is cached in memory. Otherwise, your page rendering times will be very slow!
+> [!IMPORTANT] > **Be sure to set `NODE_ENV=production`**, so that the SSR script is cached in memory. Otherwise, your page rendering times will be very slow!
 
 ### Client side hydration
 

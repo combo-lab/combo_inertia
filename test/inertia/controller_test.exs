@@ -1,7 +1,7 @@
-defmodule Inertia.ControllerTest do
+defmodule Combo.Inertia.ConnTest do
   use ExUnit.Case, async: true
 
-  import Inertia.Controller, only: [inertia_optional: 1, inertia_defer: 1, inertia_defer: 2]
+  import Combo.Inertia.Conn, only: [inertia_optional: 1, inertia_defer: 1, inertia_defer: 2]
 
   describe "inertia_optional/1" do
     test "tags a value as optional" do

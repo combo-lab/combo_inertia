@@ -1,6 +1,6 @@
-defmodule Inertia.Controller do
+defmodule Combo.Inertia.Conn do
   @moduledoc """
-  Controller functions for rendering Inertia.js responses.
+  `%Plug.Conn{}` helpers for rendering Inertia responses.
   """
 
   require Logger
@@ -16,23 +16,23 @@ defmodule Inertia.Controller do
 
   @type raw_prop_key :: atom() | String.t()
 
-  @opaque optional() :: {:optional, fun()}
-  @opaque always() :: {:keep, any()}
-  @opaque merge() :: {:merge, any()}
-  @opaque deep_merge() :: {:deep_merge, any()}
-  @opaque defer() :: {:defer, {fun(), String.t()}}
+  @opaque optional :: {:optional, fun()}
+  @opaque always :: {:keep, any()}
+  @opaque merge :: {:merge, any()}
+  @opaque deep_merge :: {:deep_merge, any()}
+  @opaque defer :: {:defer, {fun(), String.t()}}
   @opaque preserved_prop_key :: {:preserve, raw_prop_key()}
 
-  @type render_opt() :: {:ssr, boolean()}
-  @type render_opts() :: [render_opt()]
+  @type render_opt :: {:ssr, boolean()}
+  @type render_opts :: [render_opt()]
 
-  @type prop_key() :: raw_prop_key() | preserved_prop_key()
+  @type prop_key :: raw_prop_key() | preserved_prop_key()
 
   @doc """
   Marks a prop value as optional, which means it will only get evaluated if
   explicitly requested in a partial reload.
 
-  Optional props will _only_ be included the when explicitly requested in a
+  Optional props will only be included the prop when explicitly requested in a
   partial reload. If you want to include the prop on first visit, you'll want to
   use a bare anonymous function or named function reference instead.
 

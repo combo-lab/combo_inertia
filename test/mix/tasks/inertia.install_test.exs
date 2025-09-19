@@ -5,7 +5,7 @@ defmodule Mix.Tasks.Inertia.InstallTest do
   import Igniter.Test
 
   describe "Web helpers setup" do
-    test "adds import Inertia.Controller to controller function" do
+    test "adds import Combo.Inertia.Conn to controller function" do
       project = phx_test_project() |> Install.setup_controller_helpers()
 
       # Assert that the controller function has been updated
@@ -13,7 +13,7 @@ defmodule Mix.Tasks.Inertia.InstallTest do
       ...|
          |      import Plug.Conn
          |
-       + |      import Inertia.Controller
+       + |      import Combo.Inertia.Conn
          |      unquote(verified_routes())
          |    end
       ...|
