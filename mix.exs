@@ -37,11 +37,12 @@ defmodule Inertia.MixProject do
       {:plug, ">= 1.5.0 and < 2.0.0"},
       {:jason, "~> 1.2"},
       {:floki, ">= 0.30.0", only: :test},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.34", only: :dev, runtime: false},
-      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:nodejs, "~> 3.0"},
-      {:ecto, ">= 3.0.0"}
+      {:ecto, ">= 3.0.0"},
+      {:ex_check, ">= 0.0.0", only: [:dev], runtime: false},
+      {:dialyxir, ">= 0.0.0", only: [:dev], runtime: false},
+      {:credo, ">= 0.0.0", only: [:dev], runtime: false},
+      {:ex_doc, ">= 0.0.0", only: [:dev], runtime: false}
     ]
   end
 
