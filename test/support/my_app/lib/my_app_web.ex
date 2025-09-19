@@ -26,7 +26,6 @@ defmodule MyAppWeb do
       # Import common connection and controller functions to use in pipelines
       import Plug.Conn
       import Phoenix.Controller
-      import Phoenix.LiveView.Router
     end
   end
 
@@ -66,9 +65,6 @@ defmodule MyAppWeb do
     quote do
       # HTML escaping functionality
       import Phoenix.HTML
-
-      # Shortcut for generating JS commands
-      alias Phoenix.LiveView.JS
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())
