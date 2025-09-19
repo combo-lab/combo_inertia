@@ -93,7 +93,7 @@ if Code.ensure_loaded?(Igniter) do
     def setup_html_helpers(igniter) do
       update_web_ex_helper(igniter, :html, fn zipper ->
         import_code = """
-            import Inertia.HTML
+            import Combo.Inertia.HTML
         """
 
         with {:ok, zipper} <- move_to_last_import(zipper) do

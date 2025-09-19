@@ -1,4 +1,4 @@
-defmodule Inertia.HTML do
+defmodule Combo.Inertia.HTML do
   @moduledoc """
   HTML components for Inertia views.
   """

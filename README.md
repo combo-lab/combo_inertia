@@ -97,9 +97,9 @@ This library includes a few modules to help render Inertia responses:
 
 - [`Combo.Inertia.Plug`](https://hexdocs.pm/inertia/Combo.Inertia.Plug.html): a plug for detecting Inertia.js requests and preparing the connection accordingly.
 - [`Combo.Inertia.Conn`](https://hexdocs.pm/inertia/Combo.Inertia.Conn.html): controller functions for rendering Inertia.js-compatible responses.
-- [`Inertia.HTML`](https://hexdocs.pm/inertia/Inertia.HTML.html): HTML components for Inertia-powered views.
+- [`Combo.Inertia.HTML`](https://hexdocs.pm/inertia/Combo.Inertia.HTML.html): HTML components for Inertia-powered views.
 
-To get started, import `Combo.Inertia.Conn` in your controller helper and `Inertia.HTML` in your html helper:
+To get started, import `Combo.Inertia.Conn` in your controller helper and `Combo.Inertia.HTML` in your html helper:
 
 ```diff
   # lib/my_app_web.ex
@@ -116,7 +116,7 @@ To get started, import `Combo.Inertia.Conn` in your controller helper and `Inert
       quote do
         use Phoenix.Component
 
-+       import Inertia.HTML
++       import Combo.Inertia.HTML
       end
     end
   end

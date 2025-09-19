@@ -3,7 +3,7 @@ defmodule MyAppWeb.Layouts do
 
   use MyAppWeb, :html
 
-  import Inertia.HTML
+  import Combo.Inertia.HTML
 
   embed_templates "layouts/*"
 end

@@ -20,7 +20,7 @@ defmodule Mix.Tasks.Inertia.InstallTest do
       """)
     end
 
-    test "adds import Inertia.HTML to html function" do
+    test "adds import Combo.Inertia.HTML to html function" do
       project = phx_test_project() |> Install.setup_html_helpers()
 
       # Assert that the html function has been updated
@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Inertia.InstallTest do
       ...|
          |        only: [get_csrf_token: 0, view_module: 1, view_template: 1]
          |
-       + |      import Inertia.HTML
+       + |      import Combo.Inertia.HTML
        + |
          |      # Include general helpers for rendering HTML
          |      unquote(html_helpers())

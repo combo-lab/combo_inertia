@@ -598,7 +598,7 @@ defmodule Combo.Inertia.Conn do
 
   defp send_ssr_response(conn, head, body) do
     conn
-    |> put_view(Inertia.HTML)
+    |> put_view(Combo.Inertia.HTML)
     |> compile_head(head)
     |> assign(:body, body)
     |> render(:inertia_ssr)
@@ -606,7 +606,7 @@ defmodule Combo.Inertia.Conn do
 
   defp send_csr_response(conn) do
     conn
-    |> put_view(Inertia.HTML)
+    |> put_view(Combo.Inertia.HTML)
     |> render(:inertia_page, %{page: inertia_assigns(conn)})
   end
 
