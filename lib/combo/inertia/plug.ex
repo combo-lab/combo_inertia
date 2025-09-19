@@ -1,4 +1,4 @@
-defmodule Inertia.Plug do
+defmodule Combo.Inertia.Plug do
   @moduledoc """
   The plug module for detecting Inertia.js requests.
   """

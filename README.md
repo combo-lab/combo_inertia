@@ -95,7 +95,7 @@ config :inertia,
 
 This library includes a few modules to help render Inertia responses:
 
-- [`Inertia.Plug`](https://hexdocs.pm/inertia/Inertia.Plug.html): a plug for detecting Inertia.js requests and preparing the connection accordingly.
+- [`Combo.Inertia.Plug`](https://hexdocs.pm/inertia/Combo.Inertia.Plug.html): a plug for detecting Inertia.js requests and preparing the connection accordingly.
 - [`Combo.Inertia.Conn`](https://hexdocs.pm/inertia/Combo.Inertia.Conn.html): controller functions for rendering Inertia.js-compatible responses.
 - [`Inertia.HTML`](https://hexdocs.pm/inertia/Inertia.HTML.html): HTML components for Inertia-powered views.
 
@@ -132,7 +132,7 @@ Then, install the plug in your browser pipeline:
     pipeline :browser do
       plug :accepts, ["html"]
 
-+     plug Inertia.Plug
++     plug Combo.Inertia.Plug
     end
   end
 ```

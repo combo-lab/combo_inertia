@@ -8,7 +8,7 @@ defmodule MyAppWeb.Router do
     plug :put_root_layout, html: {MyAppWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug Inertia.Plug
+    plug Combo.Inertia.Plug
   end
 
   scope "/", MyAppWeb do

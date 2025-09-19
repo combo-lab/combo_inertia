@@ -121,7 +121,7 @@ if Code.ensure_loaded?(Igniter) do
 
     @doc false
     def setup_router(igniter) do
-      Igniter.Libs.Phoenix.append_to_pipeline(igniter, :browser, "plug Inertia.Plug")
+      Igniter.Libs.Phoenix.append_to_pipeline(igniter, :browser, "plug Combo.Inertia.Plug")
     end
 
     @doc false

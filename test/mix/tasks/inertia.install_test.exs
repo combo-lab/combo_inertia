@@ -38,7 +38,7 @@ defmodule Mix.Tasks.Inertia.InstallTest do
   end
 
   describe "Router setup" do
-    test "adds Inertia.Plug to browser pipeline" do
+    test "adds Combo.Inertia.Plug to browser pipeline" do
       # Setup a test project with a router file
       project = phx_test_project() |> Install.setup_router()
 
@@ -47,7 +47,7 @@ defmodule Mix.Tasks.Inertia.InstallTest do
       ...|
          |    plug(:protect_from_forgery)
          |    plug(:put_secure_browser_headers)
-       + |    plug Inertia.Plug
+       + |    plug Combo.Inertia.Plug
          |  end
       ...|
       """)
