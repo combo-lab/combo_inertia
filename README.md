@@ -287,8 +287,8 @@ After that, we need to update our root layout to load the JavaScript bundle as a
 ```diff
   # lib/my_app_web/components/layouts/root.html.eex
 
--  <script type='text/javascript' defer phx-track-static src={~p"/assets/app.js"}></script>
-+  <script type='module' defer phx-track-static src={~p"/assets/app.js"}></script>
+-  <script type='text/javascript' defer src={~p"/assets/app.js"}></script>
++  <script type='module' defer src={~p"/assets/app.js"}></script>
 ```
 
 > [!NOTE]
