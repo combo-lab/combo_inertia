@@ -1,6 +1,6 @@
-# Inertia.js Phoenix Adapter [![Hex Package](https://img.shields.io/hexpm/v/inertia)](https://hex.pm/packages/inertia) [![Hex Docs](https://img.shields.io/badge/docs-green)](https://hexdocs.pm/inertia/readme.html)
+# Combo.Inertia
 
-The official Elixir/Phoenix adapter for [Inertia.js](https://inertiajs.com/).
+Provides [Inertia](https://inertiajs.com/) integration for Combo.
 
 ## Table of Contents
 
