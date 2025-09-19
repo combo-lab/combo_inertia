@@ -527,12 +527,12 @@ conn
 
 ## Testing
 
-The `Inertia.Testing` module includes helpers for testing your Inertia controller responses, such as the `inertia_component/1` and `inertia_props/1` functions.
+The `Combo.Inertia.Testing` module includes helpers for testing your Inertia controller responses, such as the `inertia_component/1` and `inertia_props/1` functions.
 
 ```elixir
 use MyAppWeb.ConnCase
 
-import Inertia.Testing
+import Combo.Inertia.Testing
 
 describe "GET /" do
   test "renders the home page", %{conn: conn} do
@@ -546,7 +546,7 @@ end
 ```elixir
 use MyAppWeb.ConnCase
 
-import Inertia.Testing
+import Combo.Inertia.Testing
 
 describe "POST /users" do
   test "fails when name empty", %{conn: conn} do
@@ -559,7 +559,7 @@ describe "POST /users" do
 end
 ```
 
-We recommend importing `Inertia.Testing` in your `ConnCase` helper, so that it will be at the ready for all your controller tests:
+We recommend importing `Combo.Inertia.Testing` in your `ConnCase` helper, so that it will be at the ready for all your controller tests:
 
 ```elixir
 defmodule MyApp.ConnCase do
@@ -567,7 +567,7 @@ defmodule MyApp.ConnCase do
 
   using do
     quote do
-      import Inertia.Testing
+      import Combo.Inertia.Testing
 
       # ...
     end

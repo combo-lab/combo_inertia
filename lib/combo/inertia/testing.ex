@@ -1,4 +1,4 @@
-defmodule Inertia.Testing do
+defmodule Combo.Inertia.Testing do
   @moduledoc """
   Helpers for testing Inertia responses.
   """
@@ -10,7 +10,7 @@ defmodule Inertia.Testing do
 
       use MyAppWeb.ConnCase
 
-      import Inertia.Testing
+      import Combo.Inertia.Testing
 
       describe "GET /" do
         test "renders the home page", %{conn: conn} do
@@ -32,7 +32,7 @@ defmodule Inertia.Testing do
 
       use MyAppWeb.ConnCase
 
-      import Inertia.Testing
+      import Combo.Inertia.Testing
 
       describe "GET /" do
         test "renders the home page", %{conn: conn} do
@@ -57,7 +57,7 @@ defmodule Inertia.Testing do
 
       use MyAppWeb.ConnCase
 
-      import Inertia.Testing
+      import Combo.Inertia.Testing
 
       describe "POST /users" do
         test "fails when name empty", %{conn: conn} do

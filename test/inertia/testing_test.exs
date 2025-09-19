@@ -1,7 +1,7 @@
-defmodule Inertia.TestingTest do
+defmodule Combo.Inertia.TestingTest do
   use MyAppWeb.ConnCase
 
-  import Inertia.Testing
+  import Combo.Inertia.Testing
 
   setup do
     # Disable SSR by default, selectively enable it when testing
