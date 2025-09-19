@@ -5,19 +5,22 @@ defmodule Combo.Inertia.Plug do
 
   import Combo.Inertia.Conn, only: [assign_errors: 2]
   import Plug.Conn
+  alias Combo.Inertia.Config
 
   def init(opts) do
     opts
   end
 
   def call(conn, _opts) do
+    endpoint = Config.fetch_endpoint!(conn)
+
     conn
     |> assign(:inertia_head, [])
-    |> put_private(:inertia_version, compute_version())
+    |> put_private(:inertia_version, compute_version(endpoint))
     |> put_private(:inertia_error_bag, get_error_bag(conn))
-    |> put_private(:inertia_encrypt_history, default_encrypt_history())
+    |> put_private(:inertia_encrypt_history, default_encrypt_history(endpoint))
     |> put_private(:inertia_clear_history, false)
-    |> put_private(:inertia_camelize_props, default_camelize_props())
+    |> put_private(:inertia_camelize_props, default_camelize_props(endpoint))
     |> merge_forwarded_flash()
     |> fetch_inertia_errors()
     |> detect_inertia()
@@ -49,8 +52,10 @@ defmodule Combo.Inertia.Plug do
   defp detect_inertia(conn) do
     case get_req_header(conn, "x-inertia") do
       ["true"] ->
+        endpoint = Config.fetch_endpoint!(conn)
+
         conn
-        |> put_private(:inertia_version, compute_version())
+        |> put_private(:inertia_version, compute_version(endpoint))
         |> put_private(:inertia_request, true)
         |> detect_partial_reload()
         |> detect_reset()
@@ -152,11 +157,13 @@ defmodule Combo.Inertia.Plug do
     end
   end
 
-  defp compute_version do
-    if is_atom(endpoint()) and length(static_paths()) > 0 do
-      hash_static_paths(endpoint(), static_paths())
+  defp compute_version(endpoint) do
+    static_paths = static_paths(endpoint)
+
+    if static_paths != [] do
+      hash_static_paths(endpoint, static_paths)
     else
-      default_version()
+      default_version(endpoint)
     end
   end
 
@@ -194,24 +201,20 @@ defmodule Combo.Inertia.Plug do
     end
   end
 
-  defp static_paths do
-    Application.get_env(:inertia, :static_paths, [])
+  defp static_paths(endpoint) do
+    Config.get(endpoint, :static_paths, [])
   end
 
-  defp endpoint do
-    Application.get_env(:inertia, :endpoint, nil)
+  defp default_version(endpoint) do
+    Config.get(endpoint, :default_version, "1")
   end
 
-  defp default_version do
-    Application.get_env(:inertia, :default_version, "1")
+  defp default_camelize_props(endpoint) do
+    Config.get(endpoint, :camelize_props, false)
   end
 
-  defp default_camelize_props do
-    Application.get_env(:inertia, :camelize_props, false)
-  end
-
-  defp default_encrypt_history do
-    history_config = Application.get_env(:inertia, :history) || []
+  defp default_encrypt_history(endpoint) do
+    history_config = Config.get(endpoint, :history) || []
     !!history_config[:encrypt]
   end
 end

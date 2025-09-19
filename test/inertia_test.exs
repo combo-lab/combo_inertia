@@ -1,14 +1,19 @@
 defmodule InertiaTest do
   use MyAppWeb.ConnCase
-  use Phoenix.Component
 
+  use Phoenix.Component
   import Plug.Conn
+  alias Combo.Inertia.Config
 
   @current_version "db137d38dc4b6ee57d5eedcf0182de8a"
 
+  defp put_config(key, value) do
+    Config.put(MyAppWeb.Endpoint, key, value)
+  end
+
   setup do
     # Disable SSR by default, selectively enable it when testing
-    Application.put_env(:inertia, :ssr, false)
+    put_config(:ssr, false)
     :ok
   end
 
@@ -86,7 +91,7 @@ defmodule InertiaTest do
 
     start_supervised({Combo.Inertia.SSR, path: path})
 
-    Application.put_env(:inertia, :ssr, true)
+    put_config(:ssr, true)
 
     conn =
       conn
@@ -107,7 +112,7 @@ defmodule InertiaTest do
 
     start_supervised({Combo.Inertia.SSR, path: path})
 
-    Application.put_env(:inertia, :ssr, false)
+    put_config(:ssr, false)
 
     conn =
       conn
@@ -128,7 +133,7 @@ defmodule InertiaTest do
 
     start_supervised({Combo.Inertia.SSR, path: path})
 
-    Application.put_env(:inertia, :ssr, true)
+    put_config(:ssr, true)
 
     conn =
       conn
@@ -150,8 +155,8 @@ defmodule InertiaTest do
 
     start_supervised({Combo.Inertia.SSR, path: path, module: "ssr-failure"})
 
-    Application.put_env(:inertia, :ssr, true)
-    Application.put_env(:inertia, :raise_on_ssr_failure, false)
+    put_config(:ssr, true)
+    put_config(:raise_on_ssr_failure, false)
 
     conn =
       conn
@@ -169,8 +174,8 @@ defmodule InertiaTest do
 
     start_supervised({Combo.Inertia.SSR, path: path, module: "ssr-failure"})
 
-    Application.put_env(:inertia, :ssr, true)
-    Application.put_env(:inertia, :raise_on_ssr_failure, true)
+    put_config(:ssr, true)
+    put_config(:raise_on_ssr_failure, true)
 
     assert_raise(Combo.Inertia.SSR.RenderError, fn ->
       conn

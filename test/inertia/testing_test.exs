@@ -2,10 +2,15 @@ defmodule Combo.Inertia.TestingTest do
   use MyAppWeb.ConnCase
 
   import Combo.Inertia.Testing
+  alias Combo.Inertia.Config
+
+  defp put_config(key, value) do
+    Config.put(MyAppWeb.Endpoint, key, value)
+  end
 
   setup do
     # Disable SSR by default, selectively enable it when testing
-    Application.put_env(:inertia, :ssr, false)
+    put_config(:ssr, false)
     :ok
   end
 

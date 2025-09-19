@@ -7,13 +7,12 @@ config :inertia, MyAppWeb.Endpoint,
     formats: [html: MyAppWeb.ErrorHTML, json: MyAppWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: MyApp.PubSub
-
-config :inertia,
-  endpoint: MyAppWeb.Endpoint,
-  static_paths: ["/assets/app.js"],
-  default_version: "1",
-  camelize_props: false
+  pubsub_server: MyApp.PubSub,
+  inertia: [
+    static_paths: ["/assets/app.js"],
+    default_version: "1",
+    camelize_props: false
+  ]
 
 config :phoenix, :json_library, Jason
 
