@@ -30,10 +30,10 @@ defmodule Combo.Inertia.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:phoenix, "~> 1.7"},
+      {:phoenix, "~> 1.8"},
       {:phoenix_html, ">= 3.0.0"},
-      {:phoenix_live_view, "~> 1.0"},
-      {:plug, ">= 1.5.0 and < 2.0.0"},
+      {:phoenix_live_view, "~> 1.1"},
+      {:plug, "~> 1.14"},
       {:jason, "~> 1.2"},
       {:floki, ">= 0.30.0", only: :test},
       {:nodejs, "~> 3.0"},
