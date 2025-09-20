@@ -12,7 +12,65 @@ def deps do
 end
 ```
 
-Add your desired configuration into `config.exs` file:
+This package includes a few modules to help rendering Inertia responses:
+
+- `Combo.Inertia.Plug` - the plug for detecting Inertia requests and preparing the connection accordingly.
+- `Combo.Inertia.Conn` - functions for rendering Inertia responses.
+- `Combo.Inertia.HTML` - components and HTML helpers for Inertia views.
+
+First, add `Combo.Inertia.Plug` into the browser pipeline:
+
+```diff
+  # lib/my_app/web/router.ex
+  defmodule MyApp.Web.Router do
+    use MyApp.Web, :router
+
+    pipeline :browser do
+      # ...
++     plug Combo.Inertia.Plug
+    end
+  end
+```
+
+Then, import `Combo.Inertia.Conn` into the controller helper and `Combo.Inertia.HTML` into the html helper:
+
+```diff
+  # lib/my_app/web.ex
+  defmodule MyApp.Web do
+    # ...
+
+    def controller do
+      quote do
+        # ...
++       import Combo.Inertia.Conn
+      end
+    end
+
+    def html do
+      quote do
+        # ...
++       import Combo.Inertia.HTML
+      end
+    end
+
+    # ...
+  end
+```
+
+Next, replace the `<title>` tag in the layout with the `<.inertia_title>` component, so that the client-side library will keep the title in sync, and add the `<.inertia_head>` component:
+
+```diff
+  # lib/my_app/web/layouts/root.html.ceex
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+-     <title>{@page_title}</title>
++     <.inertia_title>{@page_title}</.inertia_title>
++     <.inertia_head content={@inertia_head} />
+    </head>
+```
+
+And, if you'd like to add configuration into `config.exs` file:
 
 ```elixir
 # config/config.exs
@@ -52,73 +110,15 @@ config :my_app, MyApp.Web.Endpoint,
   ]
 ```
 
-This package includes a few modules to help rendering Inertia responses:
-
-- `Combo.Inertia.Plug` - the plug for detecting Inertia requests and preparing the connection accordingly.
-- `Combo.Inertia.Conn` - functions for rendering Inertia responses.
-- `Combo.Inertia.HTML` - components and HTML helpers for Inertia views.
-
-To get started, add `Combo.Inertia.Plug` into the browser pipeline:
-
-```diff
-  # lib/my_app/web/router.ex
-  defmodule MyApp.Web.Router do
-    use MyApp.Web, :router
-
-    pipeline :browser do
-      # ...
-+     plug Combo.Inertia.Plug
-    end
-  end
-```
-
-Then, import `Combo.Inertia.Conn` in your controller helper and `Combo.Inertia.HTML` in your html helper:
-
-```diff
-  # lib/my_app/web.ex
-  defmodule MyApp.Web do
-    # ...
-
-    def controller do
-      quote do
-        # ...
-+       import Combo.Inertia.Conn
-      end
-    end
-
-    def html do
-      quote do
-        # ...
-+       import Combo.Inertia.HTML
-      end
-    end
-
-    # ...
-  end
-```
-
-Next, replace the `<title>` tag in your layout with the `<.inertia_title>` component, so that the client-side library will keep the title in sync, and add the `<.inertia_head>` component:
-
-```diff
-  # lib/my_app/web/layouts/root.html.ceex
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
--     <title>{@page_title}</title>
-+     <.inertia_title>{@page_title}</.inertia_title>
-+     <.inertia_head content={@inertia_head} />
-    </head>
-```
-
-You're now ready to start rendering inertia responses!
+You're now ready to start rendering Inertia responses!
 
 ## Rendering responses
 
 Rendering an Inertia.js response looks like this:
 
 ```elixir
-defmodule MyAppWeb.ProfileController do
-  use MyAppWeb, :controller
+defmodule MyApp.Web.ProfileController do
+  use MyApp.Web, :controller
 
   def index(conn, _params) do
     conn
