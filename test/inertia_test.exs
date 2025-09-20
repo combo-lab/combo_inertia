@@ -6,7 +6,6 @@ defmodule InertiaTest do
   alias Combo.SafeHTML
   alias Combo.Inertia.Config
 
-
   @current_version "db137d38dc4b6ee57d5eedcf0182de8a"
 
   defp put_config(key, value) do
