@@ -1,33 +1,34 @@
 defmodule Combo.Inertia.MixProject do
   use Mix.Project
 
-  @version "2.5.1"
+  @version "0.1.0"
+  @description "Provides Inertia integration for Combo."
+  @source_url "https://github.com/combo-lab/combo_inertia"
+  @changelog_url "https://github.com/combo-lab/combo_inertia/blob/v#{@version}/CHANGELOG.md"
 
   def project do
     [
       app: :combo_inertia,
       version: @version,
-      elixir: ">= 1.14.0",
-      elixirc_paths: elixirc_paths(Mix.env()),
+      elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
-      name: "Inertia",
-      source_url: links()["GitHub"],
-      homepage_url: links()["GitHub"],
       deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env()),
+      description: @description,
+      source_url: @source_url,
+      homepage_url: @source_url,
       docs: docs(),
-      description: description(),
-      package: package()
+      package: package(),
+      aliases: aliases()
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger]
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:phoenix, "~> 1.8"},
@@ -49,34 +50,33 @@ defmodule Combo.Inertia.MixProject do
 
   defp docs do
     [
-      source_ref: "v#{@version}",
+      extras: ["README.md", "CHANGELOG.md", "LICENSE"],
       main: "readme",
-      extras: [
-        "README.md",
-        "CHANGELOG.md",
-        "LICENSE.md"
-      ]
+      source_url: @source_url,
+      source_ref: "v#{@version}"
     ]
-  end
-
-  defp description do
-    "The Inertia.js adapter for Elixir/Phoenix."
   end
 
   defp package do
     [
-      maintainers: ["Derrick Reimer"],
       licenses: ["MIT"],
-      links: links()
+      links: %{
+        GitHub: @source_url,
+        Changelog: @changelog_url
+      }
     ]
   end
 
-  def links do
-    %{
-      "GitHub" => "https://github.com/inertiajs/inertia-phoenix",
-      "Changelog" =>
-        "https://github.com/inertiajs/inertia-phoenix/blob/v#{@version}/CHANGELOG.md",
-      "Readme" => "https://github.com/inertiajs/inertia-phoenix/blob/v#{@version}/README.md"
-    }
+  defp aliases do
+    [
+      publish: ["hex.publish", "tag"],
+      tag: &tag_release/1
+    ]
+  end
+
+  defp tag_release(_) do
+    Mix.shell().info("Tagging release as v#{@version}")
+    System.cmd("git", ["tag", "v#{@version}"])
+    System.cmd("git", ["push", "--tags"])
   end
 end
