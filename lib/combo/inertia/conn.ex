@@ -17,6 +17,9 @@ defmodule Combo.Inertia.Conn do
 
   @type raw_prop_key :: atom() | String.t()
 
+  @type component :: String.t()
+  @type props :: map()
+
   @opaque optional :: {:optional, fun()}
   @opaque always :: {:keep, any()}
   @opaque merge :: {:merge, any()}
@@ -317,33 +320,25 @@ defmodule Combo.Inertia.Conn do
       |> assign_prop(:user_id, 1)
       |> inertia_render("SettingsPage", %{name: "Bob"}, ssr: true)
   """
-  @spec inertia_render(Plug.Conn.t(), component :: String.t()) :: Plug.Conn.t()
-  @spec inertia_render(
-          Plug.Conn.t(),
-          component :: String.t(),
-          inline_props_or_opts :: map() | render_opts()
-        ) :: Plug.Conn.t()
-  @spec inertia_render(
-          Plug.Conn.t(),
-          component :: String.t(),
-          props :: map(),
-          opts :: render_opts()
-        ) :: Plug.Conn.t()
+
+  @spec inertia_render(Plug.Conn.t(), component()) :: Plug.Conn.t()
   def inertia_render(%Plug.Conn{} = conn, component) do
     build_inertia_response(conn, component, %{}, [])
   end
 
-  def inertia_render(%Plug.Conn{} = conn, component, inline_props) when is_map(inline_props) do
-    build_inertia_response(conn, component, inline_props, [])
+  @spec inertia_render(Plug.Conn.t(), component(), props() | render_opts()) :: Plug.Conn.t()
+  def inertia_render(%Plug.Conn{} = conn, component, props) when is_map(props) do
+    build_inertia_response(conn, component, props, [])
   end
 
   def inertia_render(%Plug.Conn{} = conn, component, opts) when is_list(opts) do
     build_inertia_response(conn, component, %{}, opts)
   end
 
-  def inertia_render(%Plug.Conn{} = conn, component, inline_props, opts)
-      when is_map(inline_props) and is_list(opts) do
-    build_inertia_response(conn, component, inline_props, opts)
+  @spec inertia_render(Plug.Conn.t(), component(), props(), render_opts()) :: Plug.Conn.t()
+  def inertia_render(%Plug.Conn{} = conn, component, props, opts)
+      when is_map(props) and is_list(opts) do
+    build_inertia_response(conn, component, props, opts)
   end
 
   defp build_inertia_response(conn, component, inline_props, opts) do
