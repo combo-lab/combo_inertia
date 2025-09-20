@@ -27,7 +27,7 @@ defmodule Combo.Inertia.HTML do
         conn
         |> assign(:page_title, page_title)
         |> assign_prop(:page_title, page_title)
-        |> render_inertia("MyPage")
+        |> inertia_render("MyPage")
       end
 
   """

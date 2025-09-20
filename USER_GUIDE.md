@@ -150,12 +150,12 @@ defmodule MyApp.Web.ProfileController do
   def index(conn, _params) do
     conn
     |> assign_prop(:text, "Hello world")
-    |> render_inertia("ProfilePage")
+    |> inertia_render("ProfilePage")
   end
 end
 ```
 
-The `assign_prop` function allows you to define props that should be passed in to the component. The `render_inertia` function accepts the conn, the name of the component to render, and an optional map containing more initial props to pass to the page component.
+The `assign_prop` function allows you to define props that should be passed in to the component. The `inertia_render` function accepts the conn, the name of the component to render, and an optional map containing more initial props to pass to the page component.
 
 This action will render an HTML page containing a `<div>` element with the name of the component and the initial props, following Inertia.js conventions. On subsequent requests dispatched by the Inertia.js client library, this action will return a JSON response with the data necessary for rendering the page.
 
@@ -177,7 +177,7 @@ defmodule MyAppWeb.ProfileController do
     conn
     |> assign_prop(:first_name, "Bob")
     |> camelize_props()
-    |> render_inertia("ProfilePage")
+    |> inertia_render("ProfilePage")
   end
 end
 ```

@@ -121,7 +121,7 @@ defmodule Combo.Inertia.Conn do
       |> assign_prop(preserve_case(:this_will_not_be_camelized), "value")
       |> assign_prop(:this_will_be_camelized, "another_value")
       |> camelize_props()
-      |> render_inertia("Home")
+      |> inertia_render("Home")
 
   You can also use this helper inside of nested props:
 
@@ -131,7 +131,7 @@ defmodule Combo.Inertia.Conn do
         this_will_be_camelized: "another_value"
       })
       |> camelize_props()
-      |> render_inertia("Home")
+      |> inertia_render("Home")
   """
   @doc since: "2.2.0"
   @spec preserve_case(raw_prop_key()) :: preserved_prop_key()
@@ -189,7 +189,7 @@ defmodule Combo.Inertia.Conn do
       conn
       |> assign_prop(:first_name, "Bob")
       |> camelize_props()
-      |> render_inertia("Home")
+      |> inertia_render("Home")
 
   You may also pass a boolean to the `camelize_props` function (to override any
   previously-set or globally-configured value):
@@ -197,7 +197,7 @@ defmodule Combo.Inertia.Conn do
       conn
       |> assign_prop(:first_name, "Bob")
       |> camelize_props(false)
-      |> render_inertia("Home")
+      |> inertia_render("Home")
   """
   @doc since: "1.0.0"
   @spec camelize_props(Plug.Conn.t()) :: Plug.Conn.t()
@@ -299,49 +299,49 @@ defmodule Combo.Inertia.Conn do
 
       conn
       |> assign_prop(:user_id, 1)
-      |> render_inertia("SettingsPage")
+      |> inertia_render("SettingsPage")
 
   You may pass additional props as map for the third argument:
 
       conn
       |> assign_prop(:user_id, 1)
-      |> render_inertia("SettingsPage", %{name: "Bob"})
+      |> inertia_render("SettingsPage", %{name: "Bob"})
 
   You may also pass options for the last positional argument:
 
       conn
       |> assign_prop(:user_id, 1)
-      |> render_inertia("SettingsPage", ssr: true)
+      |> inertia_render("SettingsPage", ssr: true)
 
       conn
       |> assign_prop(:user_id, 1)
-      |> render_inertia("SettingsPage", %{name: "Bob"}, ssr: true)
+      |> inertia_render("SettingsPage", %{name: "Bob"}, ssr: true)
   """
-  @spec render_inertia(Plug.Conn.t(), component :: String.t()) :: Plug.Conn.t()
-  @spec render_inertia(
+  @spec inertia_render(Plug.Conn.t(), component :: String.t()) :: Plug.Conn.t()
+  @spec inertia_render(
           Plug.Conn.t(),
           component :: String.t(),
           inline_props_or_opts :: map() | render_opts()
         ) :: Plug.Conn.t()
-  @spec render_inertia(
+  @spec inertia_render(
           Plug.Conn.t(),
           component :: String.t(),
           props :: map(),
           opts :: render_opts()
         ) :: Plug.Conn.t()
-  def render_inertia(%Plug.Conn{} = conn, component) do
+  def inertia_render(%Plug.Conn{} = conn, component) do
     build_inertia_response(conn, component, %{}, [])
   end
 
-  def render_inertia(%Plug.Conn{} = conn, component, inline_props) when is_map(inline_props) do
+  def inertia_render(%Plug.Conn{} = conn, component, inline_props) when is_map(inline_props) do
     build_inertia_response(conn, component, inline_props, [])
   end
 
-  def render_inertia(%Plug.Conn{} = conn, component, opts) when is_list(opts) do
+  def inertia_render(%Plug.Conn{} = conn, component, opts) when is_list(opts) do
     build_inertia_response(conn, component, %{}, opts)
   end
 
-  def render_inertia(%Plug.Conn{} = conn, component, inline_props, opts)
+  def inertia_render(%Plug.Conn{} = conn, component, inline_props, opts)
       when is_map(inline_props) and is_list(opts) do
     build_inertia_response(conn, component, inline_props, opts)
   end

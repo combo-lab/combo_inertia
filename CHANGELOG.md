@@ -66,7 +66,7 @@
   - Add `inertia_defer` function to instruct the client-side to fetch the prop value immediately after initial page load.
 - Add helpers for testing Inertia-based controller responses via the `Combo.Inertia.Testing` module.
 - Add a `camelize_props` global config option and a `camelize_props` function (to use on a per-request basis) to automatically convert prop keys from snake case to camel case.
-- Accept an `ssr` option on the `render_inertia` function.
+- Accept an `ssr` option on the `inertia_render` function.
 
 ### Changed
 
