@@ -34,7 +34,6 @@ defmodule Combo.Inertia.MixProject do
       {:phoenix_html, ">= 3.0.0"},
       {:phoenix_live_view, "~> 1.1"},
       {:plug, "~> 1.14"},
-      {:jason, "~> 1.2"},
       {:floki, ">= 0.30.0", only: :test},
       {:nodejs, "~> 3.0"},
       {:ecto, ">= 3.0.0"},

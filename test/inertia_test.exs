@@ -835,6 +835,6 @@ defmodule InertiaTest do
       |> Floki.find("div[data-page]")
       |> Floki.attribute("data-page")
 
-    Jason.decode!(json_data)
+    JSON.decode!(json_data)
   end
 end

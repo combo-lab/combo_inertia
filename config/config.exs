@@ -14,7 +14,7 @@ config :combo_inertia, MyAppWeb.Endpoint,
     camelize_props: false
   ]
 
-config :phoenix, :json_library, Jason
+config :phoenix, :json_library, JSON
 
 if Mix.env() == :test do
   import_config "test.exs"
