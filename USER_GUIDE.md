@@ -137,7 +137,55 @@ config :my_app, MyApp.Web.Endpoint,
   ]
 ```
 
-You're now ready to start rendering Inertia responses!
+### Client-side setup
+
+#### Install dependencies
+
+Once you have completed the server-side setup, you then need to setup your client-side framework.
+
+First, install React and the Inertia client-side adapter for React:
+
+```
+$ npm install -S --install-links @inertiajs/react react react-dom
+```
+
+#### Initialize the Inertia app
+
+Next, update your main JavaScript file to boot your Inertia app. To accomplish this, we'll initialize the client-side framework with the base Inertia component.
+
+```javascript
+// edit assets/src/js/app.jsx
+
+import { createInertiaApp } from "@inertiajs/react"
+import { createRoot } from "react-dom/client"
+
+createInertiaApp({
+  resolve: (name) => {
+    const pages = import.meta.glob("./Pages/**/*.jsx", { eager: true })
+    return pages[`./Pages/${name}.jsx`]
+  },
+  setup({ el, App, props }) {
+    createRoot(el).render(<App {...props} />)
+  },
+})
+```
+
+The `resolve` callback tells Inertia how to load a page component. It receives a page name as string, and returns a page component module. How you implement this callback depends on which bundler you're using. For example:
+
+```javascript
+// Vite
+resolve: name => {
+  const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true })
+  return pages[`./Pages/${name}.jsx`]
+},
+
+// Webpack
+resolve: name => require(`./Pages/${name}`),
+```
+
+By default we recommend eager loading your components, which will result in a single JavaScript bundle. However, if you'd like to lazy-load your components, see [the code splitting documentation of Inertia](https://inertiajs.com/code-splitting).
+
+The `setup` callback receives everything necessary to initialize the client-side framework, including the root Inertia `App` component.
 
 ## Rendering responses
 
