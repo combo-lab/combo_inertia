@@ -1,21 +1,5 @@
 # User Guide
 
-## Table of Contents
-
-- [Installation](#installation)
-- [Rendering responses](#rendering-responses)
-- [Setting up the client-side](#setting-up-the-client-side)
-- [Lazy data evaluation](#lazy-data-evaluation)
-- [Deferred props](#deferred-props)
-- [Merge props](#merge-props)
-- [Shared data](#shared-data)
-- [Validations](#validations)
-- [Flash messages](#flash-messages)
-- [CSRF protection](#csrf-protection)
-- [History](#history)
-- [Testing](#testing)
-- [Server-side rendering](#server-side-rendering)
-
 ## Installation
 
 Add `:combo_inertia` to the list of dependencies in `mix.exs`:
