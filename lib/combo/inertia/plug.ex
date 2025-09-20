@@ -5,6 +5,7 @@ defmodule Combo.Inertia.Plug do
   """
 
   import Plug.Conn
+  import Combo.Conn, only: [endpoint_module!: 1]
   import Combo.Inertia.Conn, only: [assign_errors: 2]
   alias Combo.Inertia.Config
 
@@ -13,7 +14,7 @@ defmodule Combo.Inertia.Plug do
   end
 
   def call(conn, _opts) do
-    endpoint = Config.fetch_endpoint!(conn)
+    endpoint = endpoint_module!(conn)
 
     conn
     |> assign(:inertia_head, [])
@@ -53,7 +54,7 @@ defmodule Combo.Inertia.Plug do
   defp detect_inertia(conn) do
     case get_req_header(conn, "x-inertia") do
       ["true"] ->
-        endpoint = Config.fetch_endpoint!(conn)
+        endpoint = endpoint_module!(conn)
 
         conn
         |> put_private(:inertia_version, compute_version(endpoint))

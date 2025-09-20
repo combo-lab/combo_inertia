@@ -31,9 +31,7 @@ defmodule Combo.Inertia.MixProject do
 
   defp deps do
     [
-      {:phoenix, "~> 1.8"},
-      {:phoenix_html, ">= 3.0.0"},
-      {:phoenix_live_view, "~> 1.1"},
+      {:combo, "~> 0.2"},
       {:plug, "~> 1.14"},
       {:floki, ">= 0.30.0", only: :test},
       {:nodejs, "~> 3.0"},

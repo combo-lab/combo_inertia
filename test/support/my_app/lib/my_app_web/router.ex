@@ -5,7 +5,7 @@ defmodule MyAppWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
-    plug :put_root_layout, html: {MyAppWeb.Layouts, :root}
+    plug :put_layout, html: {MyAppWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug Combo.Inertia.Plug

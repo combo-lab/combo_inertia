@@ -1,5 +1,5 @@
 defmodule MyAppWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :combo_inertia
+  use Combo.Endpoint, otp_app: :combo_inertia
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -22,12 +22,12 @@ defmodule MyAppWeb.Endpoint do
     only: MyAppWeb.static_paths()
 
   plug Plug.RequestId
-  plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
+  plug Plug.Telemetry, event_prefix: [:combo, :endpoint]
 
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Phoenix.json_library()
+    json_decoder: Combo.json_module()
 
   plug Plug.MethodOverride
   plug Plug.Head

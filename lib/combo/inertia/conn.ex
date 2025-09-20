@@ -6,7 +6,7 @@ defmodule Combo.Inertia.Conn do
   require Logger
 
   import Plug.Conn
-  import Phoenix.Controller
+  import Combo.Conn
 
   alias Combo.Inertia.Errors
   alias Combo.Inertia.SSR.RenderError
@@ -540,7 +540,7 @@ defmodule Combo.Inertia.Conn do
     if opts[:camelize_props] do
       key
       |> to_string()
-      |> Phoenix.Naming.camelize(:lower)
+      |> Combo.Naming.camelize(:lower)
       |> atomize_if(is_atom(key))
     else
       key
@@ -570,7 +570,7 @@ defmodule Combo.Inertia.Conn do
           send_ssr_response(conn, head, body)
 
         {:error, message} ->
-          endpoint = Config.fetch_endpoint!(conn)
+          endpoint = endpoint_module!(conn)
 
           if raise_on_ssr_failure?(endpoint) do
             raise RenderError, message: message
@@ -601,7 +601,7 @@ defmodule Combo.Inertia.Conn do
 
   defp send_ssr_response(conn, head, body) do
     conn
-    |> put_view(Combo.Inertia.HTML)
+    |> put_view(html: Combo.Inertia.HTML)
     |> compile_head(head)
     |> assign(:body, body)
     |> render(:inertia_ssr)
@@ -609,7 +609,7 @@ defmodule Combo.Inertia.Conn do
 
   defp send_csr_response(conn) do
     conn
-    |> put_view(Combo.Inertia.HTML)
+    |> put_view(html: Combo.Inertia.HTML)
     |> render(:inertia_page, %{page: inertia_assigns(conn)})
   end
 
@@ -674,7 +674,7 @@ defmodule Combo.Inertia.Conn do
       if opts[:ssr] do
         true
       else
-        endpoint = Config.fetch_endpoint!(conn)
+        endpoint = endpoint_module!(conn)
         ssr_enabled_globally?(endpoint)
       end
 

@@ -3,11 +3,6 @@ defmodule Combo.Inertia.Config do
 
   @namespace :inertia
 
-  @spec fetch_endpoint!(Plug.Conn.t()) :: module()
-  def fetch_endpoint!(conn) do
-    Map.fetch!(conn.private, :phoenix_endpoint)
-  end
-
   @spec get(module(), atom(), any()) :: any()
   def get(endpoint, key, default \\ nil) do
     otp_app(endpoint)

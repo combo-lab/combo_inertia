@@ -1,9 +1,11 @@
 defmodule InertiaTest do
   use MyAppWeb.ConnCase
 
-  use Phoenix.Component
+  use Combo.HTML
   import Plug.Conn
+  alias Combo.SafeHTML
   alias Combo.Inertia.Config
+
 
   @current_version "db137d38dc4b6ee57d5eedcf0182de8a"
 
@@ -823,8 +825,8 @@ defmodule InertiaTest do
 
   defp html_escape(content) do
     content
-    |> Phoenix.HTML.html_escape()
-    |> Phoenix.HTML.safe_to_string()
+    |> SafeHTML.to_safe()
+    |> SafeHTML.safe_to_string()
   end
 
   defp extract_page_data_from_html(raw_html) do

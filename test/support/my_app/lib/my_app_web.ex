@@ -25,18 +25,19 @@ defmodule MyAppWeb do
 
   def router do
     quote do
-      use Phoenix.Router, helpers: false
+      use Combo.Router
 
       import Plug.Conn
-      import Phoenix.Controller
+      import Combo.Conn
     end
   end
 
   def controller do
     quote do
-      use Phoenix.Controller, formats: [:html, :json]
+      use Combo.Controller, formats: [:html, :json]
 
       import Plug.Conn
+      import Combo.Conn
       import Combo.Inertia.Conn
 
       unquote(verified_routes())
@@ -45,12 +46,12 @@ defmodule MyAppWeb do
 
   def html do
     quote do
-      use Phoenix.Component
-
-      import Phoenix.Controller,
-        only: [get_csrf_token: 0, view_module: 1, view_template: 1]
-
-      import Combo.Inertia.HTML
+      import Combo.Conn,
+        only: [
+          get_csrf_token: 0,
+          view_module!: 1,
+          view_template!: 1
+        ]
 
       unquote(html_helpers())
     end
@@ -58,7 +59,9 @@ defmodule MyAppWeb do
 
   defp html_helpers do
     quote do
-      import Phoenix.HTML
+      use Combo.HTML
+
+      import Combo.Inertia.HTML
 
       unquote(verified_routes())
     end
@@ -66,7 +69,7 @@ defmodule MyAppWeb do
 
   def verified_routes do
     quote do
-      use Phoenix.VerifiedRoutes,
+      use Combo.VerifiedRoutes,
         endpoint: MyAppWeb.Endpoint,
         router: MyAppWeb.Router,
         statics: MyAppWeb.static_paths()

@@ -337,9 +337,9 @@ To share data on every request, you can use the `assign_prop/2` function inside 
 
 ```elixir
 defmodule MyApp.UserAuth do
-  import Combo.Inertia.Conn
-  import Phoenix.Controller
   import Plug.Conn
+  import Combo.Conn
+  import Combo.Inertia.Conn
 
   def authenticate_user(conn, _opts) do
     user = get_user_from_session(conn)

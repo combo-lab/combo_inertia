@@ -3,7 +3,7 @@ defmodule Combo.Inertia.HTML do
   The HTML components and helpers for Inertia views.
   """
 
-  use Phoenix.Component
+  use Combo.HTML
 
   @doc """
   Renders a `<title>` tag that includes the `inertia` attribute needed for the
@@ -45,7 +45,7 @@ defmodule Combo.Inertia.HTML do
     doc: "Content rendered inside the `title` tag."
 
   def inertia_title(assigns) do
-    ~H"""
+    ~CE"""
     <title data-prefix={@prefix} data-suffix={@suffix} inertia>
       {@prefix}{render_slot(@inner_block)}{@suffix}
     </title>
@@ -56,22 +56,22 @@ defmodule Combo.Inertia.HTML do
   attr :content, :list, required: true, doc: "The list of tags to inject into the `head` tag."
 
   def inertia_head(assigns) do
-    ~H"""
-    {Phoenix.HTML.raw(Enum.join(@content, "\n"))}
+    ~CE"""
+    {raw(Enum.join(@content, "\n"))}
     """
   end
 
   @doc false
   def inertia_page(assigns) do
-    ~H"""
-    <div id="app" data-page={Phoenix.json_library().encode!(@page)}></div>
+    ~CE"""
+    <div id="app" data-page={Combo.json_module().encode!(@page)}></div>
     """
   end
 
   @doc false
   def inertia_ssr(assigns) do
-    ~H"""
-    {Phoenix.HTML.raw(@body)}
+    ~CE"""
+    {raw(@body)}
     """
   end
 end
