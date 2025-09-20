@@ -15,8 +15,8 @@ end
 This package includes a few modules to help rendering Inertia responses:
 
 - `Combo.Inertia.Plug` - the plug for detecting Inertia requests and preparing the connection accordingly.
-- `Combo.Inertia.Conn` - functions for rendering Inertia responses.
-- `Combo.Inertia.HTML` - components and HTML helpers for Inertia views.
+- `Combo.Inertia.Conn` - the `%Plug.Conn{}` helpers for rendering Inertia responses.
+- `Combo.Inertia.HTML` - the HTML components and helpers for Inertia views.
 
 First, add `Combo.Inertia.Plug` into the browser pipeline:
 

@@ -1,10 +1,11 @@
 defmodule Combo.Inertia.Plug do
   @moduledoc """
-  The plug module for detecting Inertia.js requests.
+  The plug for detecting Inertia requests and preparing the connection
+  accordingly.
   """
 
-  import Combo.Inertia.Conn, only: [assign_errors: 2]
   import Plug.Conn
+  import Combo.Inertia.Conn, only: [assign_errors: 2]
   alias Combo.Inertia.Config
 
   def init(opts) do

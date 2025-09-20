@@ -1,19 +1,13 @@
 defmodule Combo.Inertia.HTML do
   @moduledoc """
-  HTML components for Inertia views.
+  The HTML components and helpers for Inertia views.
   """
 
   use Phoenix.Component
 
-  @doc type: :component
-  attr(:prefix, :string,
-    default: nil,
-    doc: "A prefix added before the content of `inner_block`."
-  )
-
   @doc """
   Renders a `<title>` tag that includes the `inertia` attribute needed for the
-  Inertia.js client-side to subsequently manage the page title.
+  Inertia client-side library to subsequently manage the page title.
 
   The content you provide to this component will only apply to the initial
   server-rendered response. You will also need to use the [client-side `<Head>`
@@ -22,22 +16,33 @@ defmodule Combo.Inertia.HTML do
   occurs.
 
   If you are planning to manage page titles from the server-side, you may find
-  it useful to expose the `page_title` via regular assigns (so your
-  `<.inertia_title>` can use it) AND via Inertia page props (so your client-side
-  `<Head>` use it):
+  it useful to expose the `page_title`:
+
+    * via regular assigns, so server-side `<.inertia_title>` can use it.
+    * via Inertia page props, so client-side `<Head>` can use it.
 
       def index(conn, _params)
-        page_title = "Your page title"
+        page_title = "My page title"
 
         conn
         |> assign(:page_title, page_title)
         |> assign_prop(:page_title, page_title)
-        |> render_inertia("YourPage")
+        |> render_inertia("MyPage")
       end
 
   """
-  attr(:suffix, :string, default: nil, doc: "A suffix added after the content of `inner_block`.")
-  slot(:inner_block, required: true, doc: "Content rendered inside the `title` tag.")
+  @doc type: :component
+  attr :prefix, :string,
+    default: nil,
+    doc: "A prefix added before the content of `inner_block`."
+
+  attr :suffix, :string,
+    default: nil,
+    doc: "A suffix added after the content of `inner_block`."
+
+  slot :inner_block,
+    required: true,
+    doc: "Content rendered inside the `title` tag."
 
   def inertia_title(assigns) do
     ~H"""
@@ -48,7 +53,7 @@ defmodule Combo.Inertia.HTML do
   end
 
   @doc type: :component
-  attr(:content, :list, required: true, doc: "The list of tags to inject into the `head` tag.")
+  attr :content, :list, required: true, doc: "The list of tags to inject into the `head` tag."
 
   def inertia_head(assigns) do
     ~H"""
@@ -59,7 +64,7 @@ defmodule Combo.Inertia.HTML do
   @doc false
   def inertia_page(assigns) do
     ~H"""
-    <div id="app" data-page={json_library().encode!(@page)}></div>
+    <div id="app" data-page={Phoenix.json_library().encode!(@page)}></div>
     """
   end
 
@@ -68,9 +73,5 @@ defmodule Combo.Inertia.HTML do
     ~H"""
     {Phoenix.HTML.raw(@body)}
     """
-  end
-
-  defp json_library do
-    Phoenix.json_library()
   end
 end

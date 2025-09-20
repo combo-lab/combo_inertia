@@ -5,13 +5,13 @@ defmodule Combo.Inertia.Conn do
 
   require Logger
 
+  import Plug.Conn
+  import Phoenix.Controller
+
   alias Combo.Inertia.Errors
   alias Combo.Inertia.SSR.RenderError
   alias Combo.Inertia.SSR
   alias Combo.Inertia.Config
-
-  import Phoenix.Controller
-  import Plug.Conn
 
   @title_regex ~r/<title inertia>(.*?)<\/title>/
 
