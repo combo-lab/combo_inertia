@@ -101,10 +101,6 @@ Now, the serializer simply takes the _first error message_ and returns it under 
 - Allow for external redirects from `PUT` / `PATCH` / `DELETE` requests ([#22](https://github.com/inertiajs/inertia-phoenix/pull/22))
 - Camelize prop names inside lists (e.g. `assign_prop(:items, [%{item_name: "..."}])`).
 
-### Deprecated
-
-- The `inertia_lazy/1` function has been deprecated in favor of `inertia_optional/1`
-
 ## 0.10.0
 
 ### Bug Fixes
