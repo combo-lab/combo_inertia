@@ -560,12 +560,12 @@ defmodule Combo.Inertia.Conn do
     |> put_status(200)
     |> put_resp_header("x-inertia", "true")
     |> put_resp_header("vary", "X-Inertia")
-    |> json(inertia_assigns(conn))
+    |> json(build_page_object(conn))
   end
 
   defp send_response(conn) do
     if conn.private[:inertia_ssr] do
-      case SSR.call(inertia_assigns(conn)) do
+      case SSR.call(build_page_object(conn)) do
         {:ok, %{"head" => head, "body" => body}} ->
           send_ssr_response(conn, head, body)
 
@@ -610,10 +610,11 @@ defmodule Combo.Inertia.Conn do
   defp send_csr_response(conn) do
     conn
     |> put_view(html: Combo.Inertia.HTML)
-    |> render(:inertia_page, %{page: inertia_assigns(conn)})
+    |> render(:inertia_page, %{page: build_page_object(conn)})
   end
 
-  defp inertia_assigns(conn) do
+  # see https://inertiajs.com/the-protocol#the-page-object
+  defp build_page_object(conn) do
     %{
       component: conn.private.inertia_page.component,
       props: conn.private.inertia_page.props,
