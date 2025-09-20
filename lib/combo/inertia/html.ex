@@ -1,6 +1,6 @@
 defmodule Combo.Inertia.HTML do
   @moduledoc """
-  The HTML components and helpers for Inertia views.
+  The HTML components and helpers for building Inertia views.
   """
 
   use Combo.HTML
@@ -62,6 +62,8 @@ defmodule Combo.Inertia.HTML do
   end
 
   @doc false
+  # Renders a `<div>` element with an `id` of `app`. This element serves as the
+  # mounting point for the JavaScript application.
   def inertia_page(assigns) do
     ~CE"""
     <div id="app" data-page={Combo.json_module().encode!(@page)}></div>

@@ -1,6 +1,18 @@
 # User Guide
 
+The following documentation discusses how to manually install and configure Inertia and React for a combo project.
+
+> However, Combo's project generator - [combo_new](https://github.com/combo-lab/combo_new), already includes all of this scaffolding and are the fastest way to get started with Combo and Inertia.
+
 ## Installation
+
+### Generates a project using Vite
+
+```
+$ mix combo_new frontend-vite my_app
+```
+
+### Server-side setup
 
 Add `:combo_inertia` to the list of dependencies in `mix.exs`:
 
@@ -16,7 +28,7 @@ This package includes a few modules to help rendering Inertia responses:
 
 - `Combo.Inertia.Plug` - the plug for detecting Inertia requests and preparing the connection accordingly.
 - `Combo.Inertia.Conn` - the `%Plug.Conn{}` helpers for rendering Inertia responses.
-- `Combo.Inertia.HTML` - the HTML components and helpers for Inertia views.
+- `Combo.Inertia.HTML` - the HTML components and helpers for building Inertia views.
 
 First, add `Combo.Inertia.Plug` into the browser pipeline:
 
@@ -32,7 +44,10 @@ First, add `Combo.Inertia.Plug` into the browser pipeline:
   end
 ```
 
-Then, import `Combo.Inertia.Conn` into the controller helper and `Combo.Inertia.HTML` into the html helper:
+Then:
+
+- import `Combo.Inertia.Conn` into the controller helper.
+- import `Combo.Inertia.HTML` into the html helper.
 
 ```diff
   # lib/my_app/web.ex
@@ -46,10 +61,13 @@ Then, import `Combo.Inertia.Conn` into the controller helper and `Combo.Inertia.
       end
     end
 
-    def html do
+    # ...
+
+    defp html_helpers do
       quote do
         # ...
 +       import Combo.Inertia.HTML
+        # ...
       end
     end
 
@@ -57,18 +75,27 @@ Then, import `Combo.Inertia.Conn` into the controller helper and `Combo.Inertia.
   end
 ```
 
-Next, replace the `<title>` tag in the layout with the `<.inertia_title>` component, so that the client-side library will keep the title in sync, and add the `<.inertia_head>` component:
+Next, modify the layout to:
+
+- replace the `<title>` tag in the layout with the `<.inertia_title>` component, so that the client-side library will keep the title in sync.
+- add the `<.inertia_head>` component.
 
 ```diff
   # lib/my_app/web/layouts/root.html.ceex
   <!DOCTYPE html>
   <html lang="en">
     <head>
+      <!-- ... -->
 -     <title>{assigns[:page_title]}</title>
 +     <.inertia_title>{assigns[:page_title]}</.inertia_title>
 +     <.inertia_head content={@inertia_head} />
++     <.vite_react_refresh />
++     <.vite_assets names={["src/js/app.jsx"]} />
     </head>
+    <!-- ... -->
 ```
+
+> For React applications, it's recommended to include the `<.vite_react_refresh />` component before the `<.vite_assets />` component to enable Fast Refresh in development.
 
 And, if you'd like to add configuration into `config.exs` file:
 
