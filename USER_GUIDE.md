@@ -64,8 +64,8 @@ Next, replace the `<title>` tag in the layout with the `<.inertia_title>` compon
   <!DOCTYPE html>
   <html lang="en">
     <head>
--     <title>{@page_title}</title>
-+     <.inertia_title>{@page_title}</.inertia_title>
+-     <title>{assigns[:page_title]}</title>
++     <.inertia_title>{assigns[:page_title]}</.inertia_title>
 +     <.inertia_head content={@inertia_head} />
     </head>
 ```
