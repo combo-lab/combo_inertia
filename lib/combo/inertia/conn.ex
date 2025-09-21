@@ -112,7 +112,7 @@ defmodule Combo.Inertia.Conn do
       conn
       |> assign_prop(preserve_case(:this_will_not_be_camelized), "value")
       |> assign_prop(:this_will_be_camelized, "another_value")
-      |> camelize_props()
+      |> inertia_camelize_props()
       |> inertia_render("Home")
 
   You can also use this helper inside of nested props:
@@ -122,7 +122,7 @@ defmodule Combo.Inertia.Conn do
         preserve_case(:this_will_not_be_camelized) => "value",
         this_will_be_camelized: "another_value"
       })
-      |> camelize_props()
+      |> inertia_camelize_props()
       |> inertia_render("Home")
   """
   @spec preserve_case(raw_prop_key()) :: preserved_prop_key()
@@ -175,7 +175,7 @@ defmodule Combo.Inertia.Conn do
 
       conn
       |> assign_prop(:first_name, "Bob")
-      |> camelize_props()
+      |> inertia_camelize_props()
       |> inertia_render("Home")
 
   You may also pass a boolean to the `camelize_props` function (to override any
@@ -183,17 +183,17 @@ defmodule Combo.Inertia.Conn do
 
       conn
       |> assign_prop(:first_name, "Bob")
-      |> camelize_props(false)
+      |> inertia_camelize_props(false)
       |> inertia_render("Home")
   """
-  @spec camelize_props(Plug.Conn.t()) :: Plug.Conn.t()
-  def camelize_props(conn) do
+  @spec inertia_camelize_props(Plug.Conn.t()) :: Plug.Conn.t()
+  def inertia_camelize_props(conn) do
     put_private(conn, :inertia_camelize_props, true)
   end
 
-  @spec camelize_props(Plug.Conn.t(), boolean()) :: Plug.Conn.t()
-  def camelize_props(conn, true_or_false) when is_boolean(true_or_false) do
-    put_private(conn, :inertia_camelize_props, true_or_false)
+  @spec inertia_camelize_props(Plug.Conn.t(), boolean()) :: Plug.Conn.t()
+  def inertia_camelize_props(conn, value) when is_boolean(value) do
+    put_private(conn, :inertia_camelize_props, value)
   end
 
   @doc """

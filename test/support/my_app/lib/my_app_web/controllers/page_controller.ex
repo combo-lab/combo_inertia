@@ -150,7 +150,7 @@ defmodule MyAppWeb.PageController do
     |> assign(:page_title, "Home")
     |> assign_prop(:first_name, "Bob")
     |> assign_prop(:items, [%{item_name: "Foo"}])
-    |> camelize_props()
+    |> inertia_camelize_props()
     |> inertia_render("Home")
   end
 
@@ -159,7 +159,7 @@ defmodule MyAppWeb.PageController do
     |> assign(:page_title, "Home")
     |> assign_prop(:first_name, "Bob")
     |> assign_prop(:items, inertia_defer(fn -> [%{item_name: "Foo"}] end))
-    |> camelize_props()
+    |> inertia_camelize_props()
     |> inertia_render("Home")
   end
 
@@ -169,7 +169,7 @@ defmodule MyAppWeb.PageController do
     |> assign_prop(preserve_case(:first_name), "Bob")
     |> assign_prop(:last_name, "Jones")
     |> assign_prop(:profile, %{preserve_case(:birth_year) => "Foo"})
-    |> camelize_props()
+    |> inertia_camelize_props()
     |> inertia_render("Home")
   end
 

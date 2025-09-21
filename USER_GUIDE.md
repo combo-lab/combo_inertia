@@ -233,9 +233,10 @@ If you want to automatically convert your prop keys from snake case (conventiona
 ```elixir
 import Config
 
-config :inertia,
-  endpoint: MyAppWeb.Endpoint,
-  camelize_props: true
+config :my_app, MyAppWeb.Endpoint
+  inertia: [
+    camelize_props: true
+  ]
 ```
 
 ```elixir
@@ -245,7 +246,7 @@ defmodule MyAppWeb.ProfileController do
   def index(conn, _params) do
     conn
     |> assign_prop(:first_name, "Bob")
-    |> camelize_props()
+    |> inertia_camelize_props()
     |> inertia_render("ProfilePage")
   end
 end
@@ -532,69 +533,42 @@ end
 
 ## Server-side rendering
 
-The Inertia.js client library comes with with server-side rendering (SSR) support, which means you can have your Inertia-powered client hydrate HTML that has been pre-rendered on the server (instead of performing the initial DOM rendering).
+Inertia.js comes with with server-side rendering (SSR) support.
 
 > [!NOTE]
-> The steps for enabling SSR in Phoenix are similar to other backend frameworks, but instead of running a separate Node.js server process to render HTML, this library spins up a pool of Node.js process workers to handle SSR calls and manages the state of those node processes from your Elixir process tree. This is mostly just an implementation detail that you don't need to be concerned about, but we'll highlight how our `ssr.js` script differs from the Inertia.js docs.
+> The steps for enabling SSR in Combo are similar to other backend frameworks, but instead of running a separate Node.js server process to render HTML, this package spins up a pool of Node.js process workers to handle SSR calls and manages the state of those node processes from your Elixir process tree. This is mostly just an implementation detail that you don't need to be concerned about, but we'll highlight how our `ssr.js` script differs from the Inertia.js docs.
 
-### Add a server-side rendering module
+### Adding an SSR module
 
-You'll need to create a JavaScript module that exports a `render` function to perform the actual server-side rendering of pages. For the purpose of these instructions, we'll assume you're using React. The steps would be similar for other front-end environments supported by Inertia.js, such as [Vue](https://github.com/CallumVass/inertia_vue) and [Svelte](https://github.com/tonydangblog/phoenix-inertia-svelte).
+You'll need to create a JavaScript module that exports a `render` function to perform the actual server-side rendering of pages. Let's name it `ssr.jsx`.
 
-Suppose your main `app.jsx` file looks something like this:
+```javascript
+// assets/src/js/ssr.jsx
 
-```js
-// assets/js/app.jsx
-
-import React from "react"
 import { createInertiaApp } from "@inertiajs/react"
-import { createRoot } from "react-dom/client"
-
-createInertiaApp({
-  resolve: async (name) => {
-    return await import(`./pages/${name}.jsx`)
-  },
-  setup({ App, el, props }) {
-    createRoot(el).render(<App {...props} />)
-  },
-})
-```
-
-You'll need to create a second JavaScript file (alongside your `app.jsx`) that exports a `render` function. Let's name it `ssr.jsx`.
-
-```js
-// assets/js/ssr.jsx
-
-import React from "react"
 import ReactDOMServer from "react-dom/server"
-import { createInertiaApp } from "@inertiajs/react"
 
 export function render(page) {
   return createInertiaApp({
     page,
     render: ReactDOMServer.renderToString,
-    resolve: async (name) => {
-      return await import(`./pages/${name}.jsx`)
+    resolve: (name) => {
+      const page = `./Pages/${name}.jsx`
+      const pages = import.meta.glob("./Pages/**/*.jsx", { eager: true })
+      return pages[page]
     },
     setup: ({ App, props }) => <App {...props} />,
   })
 }
 ```
 
-This is similar to the server entry-point [documented here](https://inertiajs.com/server-side-rendering#add-server-entry-point), except we are simply **exporting a function called `render`**, instead of starting a Node.js server process.
+> This is similar to the server entry-point [documented here](https://inertiajs.com/server-side-rendering#add-server-entry-point), except we are simply exporting a function called `render`, instead of starting a Node.js server process.
+
+HERE
 
 Next, configure esbuild to compile the `ssr.jsx` bundle.
 
 ```diff
-  # config/config.exs
-
-  config :esbuild,
-    version: "0.21.5",
-    app: [
-      args: ~w(js/app.jsx --bundle --target=es2020 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
-      cd: Path.expand("../assets", __DIR__),
-      env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
-    ],
 +   ssr: [
 +     args: ~w(js/ssr.jsx --bundle --platform=node --outdir=../priv --format=cjs),
 +     cd: Path.expand("../assets", __DIR__),
