@@ -15,93 +15,114 @@ defmodule Combo.Inertia.Conn do
 
   @title_regex ~r/<title inertia>(.*?)<\/title>/
 
-  @type raw_prop_key :: atom() | String.t()
-
   @type component :: String.t()
+
+  @type raw_prop_key :: atom() | String.t()
+  @type prop_key :: raw_prop_key() | preserved_prop_key()
+  @type prop_value :: any()
   @type props :: map()
 
+  @type render_opt :: {:ssr, boolean()}
+  @type render_opts :: [render_opt()]
+
   @opaque optional :: {:optional, fun()}
-  @opaque always :: {:keep, any()}
+  @opaque always :: {:always, any()}
   @opaque merge :: {:merge, any()}
   @opaque deep_merge :: {:deep_merge, any()}
   @opaque defer :: {:defer, {fun(), String.t()}}
   @opaque preserved_prop_key :: {:preserve, raw_prop_key()}
 
-  @type render_opt :: {:ssr, boolean()}
-  @type render_opts :: [render_opt()]
+  @doc """
+  Puts a prop to the Inertia page data.
 
-  @type prop_key :: raw_prop_key() | preserved_prop_key()
+  ## Examples
+
+      # ALWAYS included on standard visits
+      # OPTIONALLY included on partial reloads
+      # ALWAYS evaluated
+      inertia_put_prop(conn, :users, Users.all())
+
+      # ALWAYS included on standard visits
+      # OPTIONALLY included on partial reloads
+      # ONLY evaluated when needed
+      inertia_put_prop(conn, :users, fn -> Users.all() end)
+
+  """
+  @spec inertia_put_prop(Plug.Conn.t(), prop_key(), prop_value()) :: Plug.Conn.t()
+  def inertia_put_prop(conn, key, value) do
+    shared = conn.private[:inertia_shared] || %{}
+    new_shared = Map.put(shared, key, value)
+    put_private(conn, :inertia_shared, new_shared)
+  end
+
+  ## Partial reloads
 
   @doc """
-  Marks a prop value as optional, which means it will only get evaluated if
+  Marks a prop as "optional", which means it will only get evaluated when
   explicitly requested in a partial reload.
 
-  Optional props will only be included the prop when explicitly requested in a
-  partial reload. If you want to include the prop on first visit, you'll want to
-  use a bare anonymous function or named function reference instead.
+  ## Examples
 
-      conn
-      # ALWAYS included on first visit...
-      # OPTIONALLY included on partial reloads...
-      # ALWAYS evaluated...
-      |> inertia_put_prop(:cheap_thing, cheap_thing())
+      // NEVER included on standard visits
+      // OPTIONALLY included on partial reloads
+      // ONLY evaluated when needed
+      inertia_put_prop(conn, :users, inertia_optional(fn -> Users.all() end))
 
-      # ALWAYS included on first visit...
-      # OPTIONALLY included on partial reloads...
-      # ONLY evaluated when needed...
-      |> inertia_put_prop(:expensive_thing, fn -> calculate_thing() end)
-      |> inertia_put_prop(:another_expensive_thing, &calculate_another_thing/0)
-
-      # NEVER included on first visit...
-      # OPTIONALLY included on partial reloads...
-      # ONLY evaluated when needed...
-      |> inertia_put_prop(:super_expensive_thing, inertia_optional(fn -> calculate_thing() end))
   """
-  @spec inertia_optional(fun :: fun()) :: optional()
-  def inertia_optional(fun) when is_function(fun), do: {:optional, fun}
-
-  def inertia_optional(_) do
-    raise ArgumentError, message: "inertia_optional/1 only accepts a function argument"
-  end
+  @spec inertia_optional(fun()) :: optional()
+  def inertia_optional(fun) when is_function(fun, 0), do: {:optional, fun}
 
   @doc """
-  Marks that a prop should be merged with existing data on the client-side.
+  Marks a prop as "always", which means it will be always included in the props.
+
+  ## Examples
+
+      # ALWAYS included on standard visits
+      # ALWAYS included on partial reloads
+      # ALWAYS evaluated
+      inertia_put_prop(conn, :users, inertia_always(Users.all()))
+
   """
-  @spec inertia_merge(value :: any()) :: merge()
-  def inertia_merge(value), do: {:merge, value}
+  @spec inertia_always(value :: any()) :: always()
+  def inertia_always(value), do: {:always, value}
+
+  ## Deffered props
 
   @doc """
-  Marks that a prop should be deeply merged with existing data on the client-side.
+  Marks a prop as "defer", which means it will be loaded after initial page
+  render.
+
+  ## Examples
+
+      inertia_put_prop(conn, :users, inertia_defer(fn -> Users.all() end))
+      inertia_put_prop(conn, :users, inertia_defer(fn -> Users.all() end, "group1"))
+
   """
-  @spec inertia_deep_merge(value :: any()) :: deep_merge()
-  def inertia_deep_merge(value), do: {:deep_merge, value}
+  @spec inertia_defer(fun()) :: defer()
+  def inertia_defer(fun) when is_function(fun, 0), do: inertia_defer(fun, "default")
 
-  @doc """
-  Marks that a prop should fetched immediately after the page is loaded on the client-side.
-  """
-  @spec inertia_defer(fun :: fun()) :: defer()
-  def inertia_defer(fun) when is_function(fun), do: {:defer, {fun, "default"}}
-
-  def inertia_defer(_) do
-    raise ArgumentError, message: "inertia_defer/1 only accepts a function argument"
-  end
-
-  @spec inertia_defer(fun :: fun(), group :: String.t()) :: defer()
-  def inertia_defer(fun, group) when is_function(fun) and is_binary(group) do
+  @spec inertia_defer(fun(), String.t()) :: defer()
+  def inertia_defer(fun, group) when is_function(fun, 0) and is_binary(group) do
     {:defer, {fun, group}}
   end
 
-  def inertia_defer(_, _) do
-    raise ArgumentError, message: "inertia_defer/2 only accepts function and group arguments"
-  end
+  ## Merging props
 
   @doc """
-  Marks a prop value as "always included", which means it will be included in
-  the props on initial page load and subsequent partial loads (even when it's
-  not explicitly requested).
+  Marks a prop as "merge", which means it will be merged with existing data on
+  the client-side.
   """
-  @spec inertia_always(value :: any()) :: always()
-  def inertia_always(value), do: {:keep, value}
+  @spec inertia_merge(prop_value()) :: merge()
+  def inertia_merge(value), do: {:merge, value}
+
+  @doc """
+  Marks a prop as "deep_merge", which means it will be deeply merged with
+  existing data on the client-side.
+  """
+  @spec inertia_deep_merge(prop_value()) :: deep_merge()
+  def inertia_deep_merge(value), do: {:deep_merge, value}
+
+  ## Handling prop_key cases
 
   @doc """
   Prevents auto-transformation of a prop key to camel-case (when
@@ -127,41 +148,6 @@ defmodule Combo.Inertia.Conn do
   """
   @spec preserve_case(raw_prop_key()) :: preserved_prop_key()
   def preserve_case(key), do: {:preserve, key}
-
-  @doc """
-  Assigns a prop value to the Inertia page data.
-  """
-  @spec inertia_put_prop(Plug.Conn.t(), prop_key(), any()) :: Plug.Conn.t()
-  def inertia_put_prop(conn, key, value) do
-    shared = conn.private[:inertia_shared] || %{}
-    put_private(conn, :inertia_shared, Map.put(shared, key, value))
-  end
-
-  @doc """
-  Instucts the client-side to encrypt history for this page.
-  """
-  @spec inertia_encrypt_history(Plug.Conn.t()) :: Plug.Conn.t()
-  def inertia_encrypt_history(conn) do
-    put_private(conn, :inertia_encrypt_history, true)
-  end
-
-  @spec inertia_encrypt_history(Plug.Conn.t(), boolean()) :: Plug.Conn.t()
-  def inertia_encrypt_history(conn, value) when is_boolean(value) do
-    put_private(conn, :inertia_encrypt_history, value)
-  end
-
-  @doc """
-  Instucts the client-side to clear the history.
-  """
-  @spec inertia_clear_history(Plug.Conn.t()) :: Plug.Conn.t()
-  def inertia_clear_history(conn) do
-    put_private(conn, :inertia_clear_history, true)
-  end
-
-  @spec inertia_clear_history(Plug.Conn.t(), boolean()) :: Plug.Conn.t()
-  def inertia_clear_history(conn, value) when is_boolean(value) do
-    put_private(conn, :inertia_clear_history, value)
-  end
 
   @doc """
   Enable (or disable) automatic conversion of prop keys from snake case (e.g.
@@ -194,6 +180,35 @@ defmodule Combo.Inertia.Conn do
   @spec inertia_camelize_props(Plug.Conn.t(), boolean()) :: Plug.Conn.t()
   def inertia_camelize_props(conn, value) when is_boolean(value) do
     put_private(conn, :inertia_camelize_props, value)
+  end
+
+  ## History encryption
+
+  @doc """
+  Instucts the client-side to encrypt the current page's data before pushing
+  it to the history state.
+  """
+  @spec inertia_encrypt_history(Plug.Conn.t()) :: Plug.Conn.t()
+  def inertia_encrypt_history(conn) do
+    put_private(conn, :inertia_encrypt_history, true)
+  end
+
+  @spec inertia_encrypt_history(Plug.Conn.t(), boolean()) :: Plug.Conn.t()
+  def inertia_encrypt_history(conn, value) when is_boolean(value) do
+    put_private(conn, :inertia_encrypt_history, value)
+  end
+
+  @doc """
+  Instucts the client-side to clear the history state.
+  """
+  @spec inertia_clear_history(Plug.Conn.t()) :: Plug.Conn.t()
+  def inertia_clear_history(conn) do
+    put_private(conn, :inertia_clear_history, true)
+  end
+
+  @spec inertia_clear_history(Plug.Conn.t(), boolean()) :: Plug.Conn.t()
+  def inertia_clear_history(conn, value) when is_boolean(value) do
+    put_private(conn, :inertia_clear_history, value)
   end
 
   @doc """
@@ -323,19 +338,19 @@ defmodule Combo.Inertia.Conn do
     build_inertia_response(conn, component, props, opts)
   end
 
-  defp build_inertia_response(conn, component, inline_props, opts) do
+  defp build_inertia_response(conn, component, props, opts) do
     shared_props = conn.private[:inertia_shared] || %{}
 
     # Only render partial props if the partial component matches the current page
     is_partial = conn.private[:inertia_partial_component] == component
     only = if is_partial, do: conn.private[:inertia_partial_only], else: []
     except = if is_partial, do: conn.private[:inertia_partial_except], else: []
-    camelize_props = conn.private[:inertia_camelize_props] || false
+    camelize_props = conn.private[:inertia_camelize_props]
     reset = conn.private[:inertia_reset] || []
 
     opts = Keyword.merge(opts, camelize_props: camelize_props, reset: reset)
 
-    props = Map.merge(shared_props, inline_props)
+    props = Map.merge(shared_props, props)
     {props, merge_props, deep_merge_props} = resolve_merge_props(props, opts)
     {props, deferred_props} = resolve_deferred_props(props)
 
@@ -445,7 +460,7 @@ defmodule Combo.Inertia.Conn do
     props
     |> Enum.filter(fn {key, value} ->
       case value do
-        {:keep, _} ->
+        {:always, _} ->
           true
 
         _ ->
@@ -464,7 +479,7 @@ defmodule Combo.Inertia.Conn do
     props
     |> Enum.filter(fn {key, value} ->
       case value do
-        {:keep, _} ->
+        {:always, _} ->
           true
 
         _ ->
@@ -503,7 +518,7 @@ defmodule Combo.Inertia.Conn do
   end
 
   defp resolve_props({:optional, value}, opts), do: resolve_props(value, opts)
-  defp resolve_props({:keep, value}, opts), do: resolve_props(value, opts)
+  defp resolve_props({:always, value}, opts), do: resolve_props(value, opts)
   defp resolve_props({:merge, value}, opts), do: resolve_props(value, opts)
   defp resolve_props(fun, opts) when is_function(fun, 0), do: resolve_props(fun.(), opts)
   defp resolve_props(value, _opts), do: value

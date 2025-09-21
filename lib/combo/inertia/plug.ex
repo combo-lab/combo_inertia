@@ -37,7 +37,7 @@ defmodule Combo.Inertia.Plug do
 
       errors =
         case props[:errors] do
-          {:keep, data} -> data
+          {:always, data} -> data
           _ -> %{}
         end
 
