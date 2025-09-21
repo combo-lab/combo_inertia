@@ -57,11 +57,9 @@ defmodule Combo.Inertia.Conn do
       # ONLY evaluated when needed...
       |> assign_prop(:super_expensive_thing, inertia_optional(fn -> calculate_thing() end))
   """
-  @doc since: "1.0.0"
   @spec inertia_optional(fun :: fun()) :: optional()
   def inertia_optional(fun) when is_function(fun), do: {:optional, fun}
 
-  @doc since: "1.0.0"
   def inertia_optional(_) do
     raise ArgumentError, message: "inertia_optional/1 only accepts a function argument"
   end
@@ -69,21 +67,18 @@ defmodule Combo.Inertia.Conn do
   @doc """
   Marks that a prop should be merged with existing data on the client-side.
   """
-  @doc since: "1.0.0"
   @spec inertia_merge(value :: any()) :: merge()
   def inertia_merge(value), do: {:merge, value}
 
   @doc """
   Marks that a prop should be deeply merged with existing data on the client-side.
   """
-  @doc since: "2.5.0"
   @spec inertia_deep_merge(value :: any()) :: deep_merge()
   def inertia_deep_merge(value), do: {:deep_merge, value}
 
   @doc """
   Marks that a prop should fetched immediately after the page is loaded on the client-side.
   """
-  @doc since: "1.0.0"
   @spec inertia_defer(fun :: fun()) :: defer()
   def inertia_defer(fun) when is_function(fun), do: {:defer, {fun, "default"}}
 
@@ -91,7 +86,6 @@ defmodule Combo.Inertia.Conn do
     raise ArgumentError, message: "inertia_defer/1 only accepts a function argument"
   end
 
-  @doc since: "1.0.0"
   @spec inertia_defer(fun :: fun(), group :: String.t()) :: defer()
   def inertia_defer(fun, group) when is_function(fun) and is_binary(group) do
     {:defer, {fun, group}}
@@ -131,7 +125,6 @@ defmodule Combo.Inertia.Conn do
       |> camelize_props()
       |> inertia_render("Home")
   """
-  @doc since: "2.2.0"
   @spec preserve_case(raw_prop_key()) :: preserved_prop_key()
   def preserve_case(key), do: {:preserve, key}
 
@@ -193,13 +186,11 @@ defmodule Combo.Inertia.Conn do
       |> camelize_props(false)
       |> inertia_render("Home")
   """
-  @doc since: "1.0.0"
   @spec camelize_props(Plug.Conn.t()) :: Plug.Conn.t()
   def camelize_props(conn) do
     put_private(conn, :inertia_camelize_props, true)
   end
 
-  @doc since: "1.0.0"
   @spec camelize_props(Plug.Conn.t(), boolean()) :: Plug.Conn.t()
   def camelize_props(conn, true_or_false) when is_boolean(true_or_false) do
     put_private(conn, :inertia_camelize_props, true_or_false)
@@ -396,7 +387,6 @@ defmodule Combo.Inertia.Conn do
       |> redirect(to: "/non-inertia-powered-page")
 
   """
-  @doc since: "2.3.0"
   @spec force_inertia_redirect(Plug.Conn.t(), opts :: keyword()) :: Plug.Conn.t()
   def force_inertia_redirect(conn, _opts \\ []) do
     put_private(conn, :inertia_force_redirect, true)
