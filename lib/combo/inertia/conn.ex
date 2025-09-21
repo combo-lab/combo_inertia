@@ -145,33 +145,29 @@ defmodule Combo.Inertia.Conn do
   end
 
   @doc """
-  Instuct the client-side to encrypt history for this page.
+  Instucts the client-side to encrypt history for this page.
   """
-  @doc since: "1.0.0"
-  @spec encrypt_history(Plug.Conn.t()) :: Plug.Conn.t()
-  def encrypt_history(conn) do
+  @spec inertia_encrypt_history(Plug.Conn.t()) :: Plug.Conn.t()
+  def inertia_encrypt_history(conn) do
     put_private(conn, :inertia_encrypt_history, true)
   end
 
-  @doc since: "1.0.0"
-  @spec encrypt_history(Plug.Conn.t(), boolean()) :: Plug.Conn.t()
-  def encrypt_history(conn, true_or_false) when is_boolean(true_or_false) do
-    put_private(conn, :inertia_encrypt_history, true_or_false)
+  @spec inertia_encrypt_history(Plug.Conn.t(), boolean()) :: Plug.Conn.t()
+  def inertia_encrypt_history(conn, value) when is_boolean(value) do
+    put_private(conn, :inertia_encrypt_history, value)
   end
 
   @doc """
-  Instuct the client-side to clear the history.
+  Instucts the client-side to clear the history.
   """
-  @doc since: "1.0.0"
-  @spec clear_history(Plug.Conn.t()) :: Plug.Conn.t()
-  def clear_history(conn) do
+  @spec inertia_clear_history(Plug.Conn.t()) :: Plug.Conn.t()
+  def inertia_clear_history(conn) do
     put_private(conn, :inertia_clear_history, true)
   end
 
-  @doc since: "1.0.0"
-  @spec clear_history(Plug.Conn.t(), boolean()) :: Plug.Conn.t()
-  def clear_history(conn, true_or_false) when is_boolean(true_or_false) do
-    put_private(conn, :inertia_clear_history, true_or_false)
+  @spec inertia_clear_history(Plug.Conn.t(), boolean()) :: Plug.Conn.t()
+  def inertia_clear_history(conn, value) when is_boolean(value) do
+    put_private(conn, :inertia_clear_history, value)
   end
 
   @doc """

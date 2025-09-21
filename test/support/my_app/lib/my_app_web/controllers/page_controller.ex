@@ -134,14 +134,14 @@ defmodule MyAppWeb.PageController do
   def encrypted_history(conn, _params) do
     conn
     |> assign(:page_title, "Home")
-    |> encrypt_history()
+    |> inertia_encrypt_history()
     |> inertia_render("Home")
   end
 
   def cleared_history(conn, _params) do
     conn
     |> assign(:page_title, "Home")
-    |> clear_history()
+    |> inertia_clear_history()
     |> inertia_render("Home")
   end
 

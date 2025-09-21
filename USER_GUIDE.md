@@ -541,7 +541,7 @@ If your page props contain sensitive data (such as information about the current
 
 ```elixir
 conn
-|> encrypt_history()
+|> inertia_encrypt_history()
 ```
 
 You can also enable history encryption globally in your application config:
@@ -557,7 +557,7 @@ To instruct the client to clear this history (for example, when a user logs out)
 
 ```elixir
 conn
-|> clear_history()
+|> inertia_clear_history()
 ```
 
 ## Testing
