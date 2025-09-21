@@ -175,7 +175,7 @@ defmodule MyAppWeb.PageController do
 
   def force_redirect(conn, _params) do
     conn
-    |> force_inertia_redirect()
+    |> inertia_force_redirect()
     |> redirect(to: "/")
   end
 

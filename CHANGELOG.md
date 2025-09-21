@@ -29,7 +29,7 @@
 
 ### Added
 
-- Add a `force_inertia_redirect` plug function to instruct the client-side to always perform a full browser redirect when a redirect response is sent ([#35](https://github.com/inertiajs/inertia-phoenix/issues/35)).
+- Add a `inertia_force_redirect` plug function to instruct the client-side to always perform a full browser redirect when a redirect response is sent ([#35](https://github.com/inertiajs/inertia-phoenix/issues/35)).
 
 ### Changed
 
