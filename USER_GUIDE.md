@@ -218,13 +218,13 @@ defmodule MyApp.Web.ProfileController do
 
   def index(conn, _params) do
     conn
-    |> assign_prop(:text, "Hello world")
+    |> inertia_put_prop(:text, "Hello world")
     |> inertia_render("ProfilePage")
   end
 end
 ```
 
-The `assign_prop` function allows you to define props that should be passed in to the component. The `inertia_render` function accepts the conn, the name of the component to render, and an optional map containing more initial props to pass to the page component.
+The `inertia_put_prop` function allows you to define props that should be passed in to the component. The `inertia_render` function accepts the conn, the name of the component to render, and an optional map containing more initial props to pass to the page component.
 
 This action will render an HTML page containing a `<div>` element with the name of the component and the initial props, following Inertia.js conventions. On subsequent requests dispatched by the Inertia.js client library, this action will return a JSON response with the data necessary for rendering the page.
 
@@ -245,7 +245,7 @@ defmodule MyAppWeb.ProfileController do
 
   def index(conn, _params) do
     conn
-    |> assign_prop(:first_name, "Bob")
+    |> inertia_put_prop(:first_name, "Bob")
     |> inertia_camelize_props()
     |> inertia_render("ProfilePage")
   end
@@ -268,18 +268,18 @@ conn
 # ALWAYS included on first visit...
 # OPTIONALLY included on partial reloads...
 # ALWAYS evaluated...
-|> assign_prop(:cheap_thing, cheap_thing())
+|> inertia_put_prop(:cheap_thing, cheap_thing())
 
 # ALWAYS included on first visit...
 # OPTIONALLY included on partial reloads...
 # ONLY evaluated when needed...
-|> assign_prop(:expensive_thing, fn -> calculate_thing() end)
-|> assign_prop(:another_expensive_thing, &calculate_another_thing/0)
+|> inertia_put_prop(:expensive_thing, fn -> calculate_thing() end)
+|> inertia_put_prop(:another_expensive_thing, &calculate_another_thing/0)
 
 # NEVER included on first visit...
 # OPTIONALLY included on partial reloads...
 # ONLY evaluated when needed...
-|> assign_prop(:super_expensive_thing, inertia_optional(fn -> calculate_thing() end))
+|> inertia_put_prop(:super_expensive_thing, inertia_optional(fn -> calculate_thing() end))
 ```
 
 ## Deferred props
@@ -290,14 +290,14 @@ If you have expensive data that you'd like to automatically fetch (from the clie
 
 ```elixir
 conn
-|> assign_prop(:expensive_thing, inertia_defer(fn -> calculate_thing() end))
+|> inertia_put_prop(:expensive_thing, inertia_defer(fn -> calculate_thing() end))
 ```
 
 The `inertia_defer/1` helper accepts a function argument in the first position. You may optionally use the `inertia_defer/2` helper, which accepts a "group" name in the second position:
 
 ```elixir
 conn
-|> assign_prop(:expensive_thing, inertia_defer(fn -> calculate_thing() end, "dashboard"))
+|> inertia_put_prop(:expensive_thing, inertia_defer(fn -> calculate_thing() end, "dashboard"))
 ```
 
 If no group names are specified, then the client-side will issue a single async request to fetch all the deferred props. If there are multiple group names, then the client-side will issue one async request per group instead. This is useful if you have some very expensive data that you'd prefer fetch in parallel alongside other expensive data.
@@ -310,26 +310,26 @@ If you have prop data that should get merged with the existing data on the clien
 
 ```elixir
 conn
-|> assign_prop(:paginated_list, inertia_merge(["a", "b", "c"]))
+|> inertia_put_prop(:paginated_list, inertia_merge(["a", "b", "c"]))
 ```
 
 Merge props can also accept deferred props:
 
 ```elixir
 conn
-|> assign_prop(:paginated_list, inertia_defer(&calculate_next_page/0) |> inertia_merge())
+|> inertia_put_prop(:paginated_list, inertia_defer(&calculate_next_page/0) |> inertia_merge())
 ```
 
 If you are working with complex data structures or nested objects you can use `inertia_deep_merge(value)`
 
 ```elixir
 conn
-|> assign_prop(:complex_object, inertia_deep_merge(%{a: %{b: %{c: %{d: 1}}}}))
+|> inertia_put_prop(:complex_object, inertia_deep_merge(%{a: %{b: %{c: %{d: 1}}}}))
 ```
 
 ## Shared data
 
-To share data on every request, you can use the `assign_prop/2` function inside of a shared plug in your response pipeline. For example, suppose you have a `UserAuth` plug responsible for fetching the currently-logged in user and you want to be sure all your Inertia components receive that user data. Your plug might look something like this:
+To share data on every request, you can use the `inertia_put_prop/2` function inside of a shared plug in your response pipeline. For example, suppose you have a `UserAuth` plug responsible for fetching the currently-logged in user and you want to be sure all your Inertia components receive that user data. Your plug might look something like this:
 
 ```elixir
 defmodule MyApp.UserAuth do
@@ -346,7 +346,7 @@ defmodule MyApp.UserAuth do
     # to our Inertia props.
     conn
     |> assign(:user, user)
-    |> assign_prop(:user, serialize_user(user))
+    |> inertia_put_prop(:user, serialize_user(user))
   end
 
   # ...

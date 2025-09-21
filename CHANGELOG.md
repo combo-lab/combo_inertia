@@ -99,7 +99,7 @@ Now, the serializer simply takes the _first error message_ and returns it under 
 ### Fixed
 
 - Allow for external redirects from `PUT` / `PATCH` / `DELETE` requests ([#22](https://github.com/inertiajs/inertia-phoenix/pull/22))
-- Camelize prop names inside lists (e.g. `assign_prop(:items, [%{item_name: "..."}])`).
+- Camelize prop names inside lists (e.g. `inertia_put_prop(:items, [%{item_name: "..."}])`).
 
 ## 0.10.0
 

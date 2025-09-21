@@ -44,18 +44,18 @@ defmodule Combo.Inertia.Conn do
       # ALWAYS included on first visit...
       # OPTIONALLY included on partial reloads...
       # ALWAYS evaluated...
-      |> assign_prop(:cheap_thing, cheap_thing())
+      |> inertia_put_prop(:cheap_thing, cheap_thing())
 
       # ALWAYS included on first visit...
       # OPTIONALLY included on partial reloads...
       # ONLY evaluated when needed...
-      |> assign_prop(:expensive_thing, fn -> calculate_thing() end)
-      |> assign_prop(:another_expensive_thing, &calculate_another_thing/0)
+      |> inertia_put_prop(:expensive_thing, fn -> calculate_thing() end)
+      |> inertia_put_prop(:another_expensive_thing, &calculate_another_thing/0)
 
       # NEVER included on first visit...
       # OPTIONALLY included on partial reloads...
       # ONLY evaluated when needed...
-      |> assign_prop(:super_expensive_thing, inertia_optional(fn -> calculate_thing() end))
+      |> inertia_put_prop(:super_expensive_thing, inertia_optional(fn -> calculate_thing() end))
   """
   @spec inertia_optional(fun :: fun()) :: optional()
   def inertia_optional(fun) when is_function(fun), do: {:optional, fun}
@@ -110,15 +110,15 @@ defmodule Combo.Inertia.Conn do
   ## Example
 
       conn
-      |> assign_prop(preserve_case(:this_will_not_be_camelized), "value")
-      |> assign_prop(:this_will_be_camelized, "another_value")
+      |> inertia_put_prop(preserve_case(:this_will_not_be_camelized), "value")
+      |> inertia_put_prop(:this_will_be_camelized, "another_value")
       |> inertia_camelize_props()
       |> inertia_render("Home")
 
   You can also use this helper inside of nested props:
 
       conn
-      |> assign_prop(:user, %{
+      |> inertia_put_prop(:user, %{
         preserve_case(:this_will_not_be_camelized) => "value",
         this_will_be_camelized: "another_value"
       })
@@ -131,8 +131,8 @@ defmodule Combo.Inertia.Conn do
   @doc """
   Assigns a prop value to the Inertia page data.
   """
-  @spec assign_prop(Plug.Conn.t(), prop_key(), any()) :: Plug.Conn.t()
-  def assign_prop(conn, key, value) do
+  @spec inertia_put_prop(Plug.Conn.t(), prop_key(), any()) :: Plug.Conn.t()
+  def inertia_put_prop(conn, key, value) do
     shared = conn.private[:inertia_shared] || %{}
     put_private(conn, :inertia_shared, Map.put(shared, key, value))
   end
@@ -174,7 +174,7 @@ defmodule Combo.Inertia.Conn do
   response props.
 
       conn
-      |> assign_prop(:first_name, "Bob")
+      |> inertia_put_prop(:first_name, "Bob")
       |> inertia_camelize_props()
       |> inertia_render("Home")
 
@@ -182,7 +182,7 @@ defmodule Combo.Inertia.Conn do
   previously-set or globally-configured value):
 
       conn
-      |> assign_prop(:first_name, "Bob")
+      |> inertia_put_prop(:first_name, "Bob")
       |> inertia_camelize_props(false)
       |> inertia_render("Home")
   """
@@ -249,7 +249,7 @@ defmodule Combo.Inertia.Conn do
       |> bag_errors(conn)
       |> inertia_always()
 
-    assign_prop(conn, :errors, errors)
+    inertia_put_prop(conn, :errors, errors)
   end
 
   def assign_errors(conn, data, msg_func) do
@@ -259,7 +259,7 @@ defmodule Combo.Inertia.Conn do
       |> bag_errors(conn)
       |> inertia_always()
 
-    assign_prop(conn, :errors, errors)
+    inertia_put_prop(conn, :errors, errors)
   end
 
   defp bag_errors(errors, conn) do
@@ -283,23 +283,23 @@ defmodule Combo.Inertia.Conn do
   ## Examples
 
       conn
-      |> assign_prop(:user_id, 1)
+      |> inertia_put_prop(:user_id, 1)
       |> inertia_render("SettingsPage")
 
   You may pass additional props as map for the third argument:
 
       conn
-      |> assign_prop(:user_id, 1)
+      |> inertia_put_prop(:user_id, 1)
       |> inertia_render("SettingsPage", %{name: "Bob"})
 
   You may also pass options for the last positional argument:
 
       conn
-      |> assign_prop(:user_id, 1)
+      |> inertia_put_prop(:user_id, 1)
       |> inertia_render("SettingsPage", ssr: true)
 
       conn
-      |> assign_prop(:user_id, 1)
+      |> inertia_put_prop(:user_id, 1)
       |> inertia_render("SettingsPage", %{name: "Bob"}, ssr: true)
   """
 
