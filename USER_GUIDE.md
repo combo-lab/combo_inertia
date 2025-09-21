@@ -1,12 +1,14 @@
 # User Guide
 
-The following documentation discusses how to manually install and configure Inertia and React for a combo project.
+The following documentation discusses how to manually install and configure Inertia for a combo project.
+
+In following content, we'll use React, but the process is similar for other Inertia-compatible frameworks, like Vue or Svelte.
 
 > However, Combo's project generator - [combo_new](https://github.com/combo-lab/combo_new), already includes all of this scaffolding and are the fastest way to get started with Combo and Inertia.
 
 ## Installation
 
-### Generates a project using Vite
+### Generating a project using Vite
 
 ```
 $ mix combo_new frontend-vite my_app
@@ -139,30 +141,52 @@ config :my_app, MyApp.Web.Endpoint,
 
 ### Client-side setup
 
-#### Install dependencies
+#### Updating vite.config.js
 
-Once you have completed the server-side setup, you then need to setup your client-side framework.
+```
+$ npm install -D --install-links @vitejs/plugin-react
+```
 
-First, install React and the Inertia client-side adapter for React:
+```diff
+  import { defineConfig } from "vite"
+  import combo from "vite-plugin-combo"
++ import react from "@vitejs/plugin-react"
+
+  export default defineConfig({
+    plugins: [
+      combo({
+        input: ["src/js/app.jsx"],
+        staticDir: "../priv/static",
+      }),
++     react(),
+    ],
+  })
+```
+
+#### Installing React and Inertia adapter
 
 ```
 $ npm install -S --install-links @inertiajs/react react react-dom
 ```
 
-#### Initialize the Inertia app
+#### Creating the Inertia app
 
-Next, update your main JavaScript file to boot your Inertia app. To accomplish this, we'll initialize the client-side framework with the base Inertia component.
+Next, rename `app.js` to `app.jsx` and update it to create your Inertia app:
 
 ```javascript
-// edit assets/src/js/app.jsx
+// assets/src/js/app.jsx
 
 import { createInertiaApp } from "@inertiajs/react"
 import { createRoot } from "react-dom/client"
 
+import axios from "axios"
+axios.defaults.xsrfHeaderName = "x-csrf-token"
+
 createInertiaApp({
   resolve: (name) => {
+    const page = `./Pages/${name}.jsx`
     const pages = import.meta.glob("./Pages/**/*.jsx", { eager: true })
-    return pages[`./Pages/${name}.jsx`]
+    return pages[page]
   },
   setup({ el, App, props }) {
     createRoot(el).render(<App {...props} />)
@@ -170,22 +194,19 @@ createInertiaApp({
 })
 ```
 
-The `resolve` callback tells Inertia how to load a page component. It receives a page name as string, and returns a page component module. How you implement this callback depends on which bundler you're using. For example:
-
-```javascript
-// Vite
-resolve: name => {
-  const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true })
-  return pages[`./Pages/${name}.jsx`]
-},
-
-// Webpack
-resolve: name => require(`./Pages/${name}`),
-```
-
-By default we recommend eager loading your components, which will result in a single JavaScript bundle. However, if you'd like to lazy-load your components, see [the code splitting documentation of Inertia](https://inertiajs.com/code-splitting).
+The `resolve` callback tells Inertia how to load a page component. It receives a page name as string, and returns a page component module. By default we recommend eager loading your components, which will result in a single JavaScript bundle. However, if you'd like to lazy-load your components, see [the code splitting documentation of Inertia](https://inertiajs.com/code-splitting).
 
 The `setup` callback receives everything necessary to initialize the client-side framework, including the root Inertia `App` component.
+
+The above code assumes your pages live in the `assets/src/js/Pages` directory and have a default export with page component, like this:
+
+```javascript
+// assets/js/src/Pages/Dashboard.jsx
+
+export default Dashboard() {
+  return <div>{/* ... page contents ...*/}</div>
+}
+```
 
 ## Rendering responses
 
@@ -229,107 +250,6 @@ defmodule MyAppWeb.ProfileController do
   end
 end
 ```
-
-## Setting up the client-side
-
-The [Inertia.js docs](https://inertiajs.com/client-side-setup) provide a good general walk-through on how to setup your JavaScript assets to boot your Inertia app. If you're new to Inertia, we recommend checking that out to familiarize yourself with how it all works. Here we'll provide some guidance on getting your Phoenix app with esbuild configured for basic client-side rendering (and further down, we'll delve into server-side rendering).
-
-To get started, install the Inertia.js library for the frontend framework of your choice. In these instructions we'll use React, but the process is similar for other Inertia-compatible frameworks, like Vue or Svelte.
-
-```
-cd assets
-npm install @inertiajs/react react react-dom
-```
-
-Replace the contents of your `app.js` file with the Inertia boot function and rename it to `app.jsx` (since we are using JSX).
-
-```javascript
-// assets/js/app.jsx
-
-import React from "react"
-import axios from "axios"
-
-import { createInertiaApp } from "@inertiajs/react"
-import { createRoot } from "react-dom/client"
-
-axios.defaults.xsrfHeaderName = "x-csrf-token"
-
-createInertiaApp({
-  resolve: async (name) => {
-    return await import(`./pages/${name}.jsx`)
-  },
-  setup({ App, el, props }) {
-    createRoot(el).render(<App {...props} />)
-  },
-})
-```
-
-The example above assumes your pages live in the `assets/js/pages` directory and have a default export with page component, like this:
-
-```javascript
-// assets/js/pages/Dashboard.jsx
-
-import React from "react"
-
-const Dashboard = () => {
-  return <div>{/* ... page contents ...*/}</div>
-}
-
-export default Dashboard
-```
-
-Next, make some adjustments to your esbuild config:
-
-- Ensure the version is >= 0.19.0 (this is required for glob-style imports for your pages)
-- Update your entrypoint filename to the correct `.jsx` extension
-- Ensure your build `--target` is at least `es2020`
-
-```elixir
-# config/config.exs
-
-config :esbuild,
-  version: "0.21.5",
-  my_app: [
-    args: ~w(js/app.jsx --bundle --target=es2020 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
-    cd: Path.expand("../assets", __DIR__),
-    env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
-  ]
-```
-
-If you updated your esbuild version, you'll need to run `mix esbuild.install` to fetch the new version.
-
-Esbuild also supports code-splitting, which can be useful for larger applications. To enable it, you'll need to:
-
-- Set the `format` as [`esm`](https://esbuild.github.io/api/#format-esm)
-- Add the [`--splitting`](https://esbuild.github.io/api/#splitting) flag
-- Optionally, set the [`chunk-names`](https://esbuild.github.io/api/#chunk-names) flag to customize the output filenames
-
-```diff
-  # config/config.exs
-
-  config :esbuild,
-    version: "0.21.5",
-    my_app: [
--     args: ~w(js/app.jsx --bundle --target=es2020 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
-+     args: ~w(js/app.jsx --bundle --chunk-names=chunks/[name]-[hash] --splitting --format=esm --target=es2020 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
-      cd: Path.expand("../assets", __DIR__),
-      env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
-    ]
-```
-
-After that, we need to update our root layout to load the JavaScript bundle as an ESM module (by changing the `type` attribute from `text/javascript` to `module`):
-
-```diff
-  # lib/my_app_web/components/layouts/root.html.eex
-
--  <script type='text/javascript' defer src={~p"/assets/app.js"}></script>
-+  <script type='module' defer src={~p"/assets/app.js"}></script>
-```
-
-> [!NOTE]
-> ESM code splitting requires modern browser support.
-> While most current browsers support ESM modules, you should verify compatibility requirements with your target audience.
-> You can read more about how code-splitting works with esbuild in the [official documentation](https://esbuild.github.io/api/#chunk-names).
 
 ## Lazy data evaluation
 
