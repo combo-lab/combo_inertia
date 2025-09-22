@@ -18,6 +18,7 @@ defmodule Combo.Inertia.Plug do
 
     conn
     |> assign(:inertia_head, [])
+    |> assign(:inertia_ssr?, ssr?(endpoint))
     |> put_private(:inertia_version, compute_version(endpoint))
     |> put_private(:inertia_error_bag, get_error_bag(conn))
     |> put_private(:inertia_encrypt_history, default_encrypt_history(endpoint))
@@ -218,5 +219,9 @@ defmodule Combo.Inertia.Plug do
   defp default_encrypt_history(endpoint) do
     history_config = Config.get(endpoint, :history) || []
     !!history_config[:encrypt]
+  end
+
+  defp ssr?(endpoint) do
+    Config.get(endpoint, :ssr, false)
   end
 end
