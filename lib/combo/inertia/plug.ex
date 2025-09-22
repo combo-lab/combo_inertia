@@ -6,7 +6,15 @@ defmodule Combo.Inertia.Plug do
 
   import Plug.Conn
   import Combo.Conn, only: [endpoint_module!: 1]
-  import Combo.Inertia.Conn, only: [inertia_put_errors: 2]
+
+  import Combo.Inertia.Conn,
+    only: [
+      inertia_encrypt_history: 2,
+      inertia_clear_history: 2,
+      inertia_camelize_props: 2,
+      inertia_put_errors: 2
+    ]
+
   alias Combo.Inertia.Config
 
   def init(opts) do
@@ -18,12 +26,12 @@ defmodule Combo.Inertia.Plug do
 
     conn
     |> assign(:inertia_head, [])
-    |> assign(:inertia_ssr?, ssr?(endpoint))
+    |> assign(:inertia_ssr?, global_ssr?(endpoint))
     |> put_private(:inertia_version, compute_version(endpoint))
+    |> inertia_encrypt_history(global_encrypt_history?(endpoint))
+    |> inertia_clear_history(false)
+    |> inertia_camelize_props(global_camelize_props?(endpoint))
     |> put_private(:inertia_error_bag, get_error_bag(conn))
-    |> put_private(:inertia_encrypt_history, default_encrypt_history(endpoint))
-    |> put_private(:inertia_clear_history, false)
-    |> put_private(:inertia_camelize_props, default_camelize_props(endpoint))
     |> merge_forwarded_flash()
     |> fetch_inertia_errors()
     |> detect_inertia()
@@ -212,16 +220,15 @@ defmodule Combo.Inertia.Plug do
     Config.get(endpoint, :default_version, "1")
   end
 
-  defp default_camelize_props(endpoint) do
+  defp global_encrypt_history?(endpoint) do
+    Config.get(endpoint, :encrypt_history, false)
+  end
+
+  defp global_camelize_props?(endpoint) do
     Config.get(endpoint, :camelize_props, false)
   end
 
-  defp default_encrypt_history(endpoint) do
-    history_config = Config.get(endpoint, :history) || []
-    !!history_config[:encrypt]
-  end
-
-  defp ssr?(endpoint) do
+  defp global_ssr?(endpoint) do
     Config.get(endpoint, :ssr, false)
   end
 end
