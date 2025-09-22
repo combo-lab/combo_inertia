@@ -1,10 +1,10 @@
 defprotocol Combo.Inertia.Errors do
   @moduledoc ~S"""
-  Converts a value to Inertia.js-compatible [validation
+  Converts a value to Inertia-compatible [validation
   errors](https://inertiajs.com/validation).
 
   This protocol allows you to transform various error structures into the format
-  expected by Inertia.js for client-side validation. The protocol converts error
+  expected by Inertia for client-side validation. The protocol converts error
   structures into a flat map where keys represent field paths and values are error
   messages.
 
@@ -28,13 +28,13 @@ defprotocol Combo.Inertia.Errors do
       # Convert changeset errors and share them with Inertia
       {:error, changeset} ->
         conn
-        |> assign_errors(changeset)
+        |> inertia_put_errors(changeset)
         |> redirect(conn, to: ~p"/posts/new")
     end
   end
   ```
 
-  The `assign_errors/2` function is a convenience helper provided by `Combo.Inertia.Conn`
+  The `inertia_put_errors/2` function is a convenience helper provided by `Combo.Inertia.Conn`
   that internally uses `Combo.Inertia.Errors.to_errors/1` to serialize the changeset errors
   and share them with the Inertia page under the `errors` key.
 

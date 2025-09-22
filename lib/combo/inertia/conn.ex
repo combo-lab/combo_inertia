@@ -245,19 +245,19 @@ defmodule Combo.Inertia.Conn do
   can override the message function:
 
       conn
-      |> assign_errors(changeset, fn {msg, opts} ->
+      |> inertia_put_errors(changeset, fn {msg, opts} ->
         if count = opts[:count] do
-          Gettext.dngettext(MyAppWeb.Gettext, "errors", msg, msg, count, opts)
+          Gettext.dngettext(MyApp.Web.Gettext, "errors", msg, msg, count, opts)
         else
-          Gettext.dgettext(MyAppWeb.Gettext, "errors", msg, opts)
+          Gettext.dgettext(MyApp.Web.Gettext, "errors", msg, opts)
         end
       end)
 
   """
-  @spec assign_errors(Plug.Conn.t(), data :: term()) :: Plug.Conn.t()
-  @spec assign_errors(Plug.Conn.t(), data :: term(), msg_func :: function()) ::
+  @spec inertia_put_errors(Plug.Conn.t(), data :: term()) :: Plug.Conn.t()
+  @spec inertia_put_errors(Plug.Conn.t(), data :: term(), msg_func :: function()) ::
           Plug.Conn.t()
-  def assign_errors(conn, data) do
+  def inertia_put_errors(conn, data) do
     errors =
       data
       |> Errors.to_errors()
@@ -267,7 +267,7 @@ defmodule Combo.Inertia.Conn do
     inertia_put_prop(conn, :errors, errors)
   end
 
-  def assign_errors(conn, data, msg_func) do
+  def inertia_put_errors(conn, data, msg_func) do
     errors =
       data
       |> Errors.to_errors(msg_func)
@@ -382,7 +382,7 @@ defmodule Combo.Inertia.Conn do
   def inertia_response?(_), do: false
 
   @doc """
-  Forces the Inertia.js client side to perform a redirect. This can be used as a
+  Forces the Inertia client side to perform a redirect. This can be used as a
   plug or inline when building a response.
 
   This plug modifies the response to be a 409 Conflict response and include the

@@ -1,4 +1,4 @@
-defmodule MyAppWeb.Endpoint do
+defmodule MyApp.Web.Endpoint do
   use Combo.Endpoint, otp_app: :combo_inertia
 
   # The session will be stored in the cookie and signed,
@@ -19,7 +19,7 @@ defmodule MyAppWeb.Endpoint do
     at: "/",
     from: :combo_inertia,
     gzip: false,
-    only: MyAppWeb.static_paths()
+    only: MyApp.Web.static_paths()
 
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:combo, :endpoint]
@@ -32,5 +32,5 @@ defmodule MyAppWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug MyAppWeb.Router
+  plug MyApp.Web.Router
 end

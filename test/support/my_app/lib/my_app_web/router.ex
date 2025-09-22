@@ -1,17 +1,17 @@
-defmodule MyAppWeb.Router do
-  use MyAppWeb, :router
+defmodule MyApp.Web.Router do
+  use MyApp.Web, :router
 
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
-    plug :put_layout, html: {MyAppWeb.Layouts, :root}
+    plug :put_layout, html: {MyApp.Web.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug Combo.Inertia.Plug
   end
 
-  scope "/", MyAppWeb do
+  scope "/", MyApp.Web do
     pipe_through(:browser)
 
     get "/", PageController, :index

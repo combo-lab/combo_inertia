@@ -1,5 +1,5 @@
-defmodule Inertia do
+defmodule Combo.Inertia do
   @moduledoc """
-  The Inertia.js adapter for Elixir/Phoenix applications.
+  Provides Inertia integration for Combo.
   """
 end

@@ -1,11 +1,11 @@
 defmodule Combo.Inertia.TestingTest do
-  use MyAppWeb.ConnCase
+  use MyApp.Web.ConnCase
 
   import Combo.Inertia.Testing
   alias Combo.Inertia.Config
 
   defp put_config(key, value) do
-    Config.put(MyAppWeb.Endpoint, key, value)
+    Config.put(MyApp.Web.Endpoint, key, value)
   end
 
   setup do

@@ -6,7 +6,7 @@ defmodule Combo.Inertia.Plug do
 
   import Plug.Conn
   import Combo.Conn, only: [endpoint_module!: 1]
-  import Combo.Inertia.Conn, only: [assign_errors: 2]
+  import Combo.Inertia.Conn, only: [inertia_put_errors: 2]
   alias Combo.Inertia.Config
 
   def init(opts) do
@@ -31,7 +31,7 @@ defmodule Combo.Inertia.Plug do
 
   defp fetch_inertia_errors(conn) do
     errors = get_session(conn, "inertia_errors") || %{}
-    conn = assign_errors(conn, errors)
+    conn = inertia_put_errors(conn, errors)
 
     register_before_send(conn, fn %{status: status} = conn ->
       props = conn.private[:inertia_shared] || %{}

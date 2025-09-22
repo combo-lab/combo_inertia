@@ -1,5 +1,5 @@
 defmodule InertiaTest do
-  use MyAppWeb.ConnCase
+  use MyApp.Web.ConnCase
 
   use Combo.HTML
   import Plug.Conn
@@ -9,7 +9,7 @@ defmodule InertiaTest do
   @current_version "db137d38dc4b6ee57d5eedcf0182de8a"
 
   defp put_config(key, value) do
-    Config.put(MyAppWeb.Endpoint, key, value)
+    Config.put(MyApp.Web.Endpoint, key, value)
   end
 
   setup do

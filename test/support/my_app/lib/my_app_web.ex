@@ -1,12 +1,12 @@
-defmodule MyAppWeb do
+defmodule MyApp.Web do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, components, channels, and so on.
 
   This can be used in your application as:
 
-      use MyAppWeb, :controller
-      use MyAppWeb, :html
+      use MyApp.Web, :controller
+      use MyApp.Web, :html
 
   The definitions below will be executed for every controller,
   component, etc, so keep them short and clean, focused
@@ -70,9 +70,9 @@ defmodule MyAppWeb do
   def verified_routes do
     quote do
       use Combo.VerifiedRoutes,
-        endpoint: MyAppWeb.Endpoint,
-        router: MyAppWeb.Router,
-        statics: MyAppWeb.static_paths()
+        endpoint: MyApp.Web.Endpoint,
+        router: MyApp.Web.Router,
+        statics: MyApp.Web.static_paths()
     end
   end
 end

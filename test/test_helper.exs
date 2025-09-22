@@ -1,3 +1,3 @@
 ExUnit.start()
 
-{:ok, _pid} = MyAppWeb.Endpoint.start_link()
+{:ok, _pid} = MyApp.Web.Endpoint.start_link()

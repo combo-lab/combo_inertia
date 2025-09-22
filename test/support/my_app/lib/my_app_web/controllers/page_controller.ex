@@ -1,5 +1,5 @@
-defmodule MyAppWeb.PageController do
-  use MyAppWeb, :controller
+defmodule MyApp.Web.PageController do
+  use MyApp.Web, :controller
 
   def index(conn, _params) do
     conn
@@ -58,7 +58,7 @@ defmodule MyAppWeb.PageController do
 
     conn
     |> assign(:page_title, "Home")
-    |> assign_errors(changeset)
+    |> inertia_put_errors(changeset)
     |> inertia_render("Home")
   end
 
@@ -66,14 +66,14 @@ defmodule MyAppWeb.PageController do
     changeset = MyApp.User.changeset(%MyApp.User{}, %{settings: %{}})
 
     conn
-    |> assign_errors(changeset)
+    |> inertia_put_errors(changeset)
     |> redirect(to: ~p"/")
   end
 
   def bad_error_map(conn, _params) do
     conn
     |> assign(:page_title, "Home")
-    |> assign_errors(%{user: %{name: ["is required"]}})
+    |> inertia_put_errors(%{user: %{name: ["is required"]}})
     |> inertia_render("Home")
   end
 

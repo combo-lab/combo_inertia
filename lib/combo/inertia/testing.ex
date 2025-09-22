@@ -4,12 +4,11 @@ defmodule Combo.Inertia.Testing do
   """
 
   @doc """
-  Fetches the Inertia component (if applicable) for the current request.
+  Gets the Inertia component for given `%Plug.Conn{}`.
 
   ## Example
 
-      use MyAppWeb.ConnCase
-
+      use MyApp.Web.ConnCase
       import Combo.Inertia.Testing
 
       describe "GET /" do
@@ -18,6 +17,7 @@ defmodule Combo.Inertia.Testing do
           assert inertia_component(conn) == "Home"
         end
       end
+
   """
   @spec inertia_component(Plug.Conn.t()) :: String.t() | nil
   def inertia_component(conn) do
@@ -26,12 +26,11 @@ defmodule Combo.Inertia.Testing do
   end
 
   @doc """
-  Fetches the Inertia props (if applicable) for the current request.
+  Gets the Inertia props for given `%Plug.Conn{}`.
 
   ## Example
 
-      use MyAppWeb.ConnCase
-
+      use MyApp.Web.ConnCase
       import Combo.Inertia.Testing
 
       describe "GET /" do
@@ -40,6 +39,7 @@ defmodule Combo.Inertia.Testing do
           assert %{user: %{id: 1}} = inertia_props(conn)
         end
       end
+
   """
   @spec inertia_props(Plug.Conn.t()) :: map() | nil
   def inertia_props(conn) do
@@ -48,15 +48,14 @@ defmodule Combo.Inertia.Testing do
   end
 
   @doc """
-  Fetches the Inertia errors (if applicable) for the current request.
+  Gets the Inertia errors for given `%Plug.Conn{}`.
 
   If there are errors available in the current page props, they will be returned.
   Otherwise, errors that have been stored in the session will be retrieved.
 
   ## Example
 
-      use MyAppWeb.ConnCase
-
+      use MyApp.Web.ConnCase
       import Combo.Inertia.Testing
 
       describe "POST /users" do
@@ -68,6 +67,7 @@ defmodule Combo.Inertia.Testing do
           assert inertia_errors(conn) == %{"name" => "can't be blank"}
         end
       end
+
   """
   @spec inertia_errors(Plug.Conn.t()) :: map()
   def inertia_errors(conn) do

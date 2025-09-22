@@ -58,7 +58,7 @@
 
 ### Added
 
-- Add support new Inertia.js v2.0.0.
+- Add support new Inertia v2.0.0.
   - Add `encrypt_history` function to instruct the client-side to encrypt the history entry.
   - Add `clear_history` function to instruct the client-side to clear history.
   - Add `inertia_optional` function, to replace the now-deprecated `inertia_lazy` function.
@@ -133,7 +133,7 @@ Now, the serializer simply takes the _first error message_ and returns it under 
 
 ## 0.5.0
 
-- Assign errors via an `assign_errors` helper ([#10](https://github.com/inertiajs/inertia-phoenix/issues/10))
+- Assign errors via an `inertia_put_errors` helper ([#10](https://github.com/inertiajs/inertia-phoenix/issues/10))
 - Preserve assigned errors across redirects ([#10](https://github.com/inertiajs/inertia-phoenix/issues/10))
 - Set up external redirects properly for Inertia requests ([#11](https://github.com/inertiajs/inertia-phoenix/issues/11))
 - Pass CSRF tokens via cookies ([#12](https://github.com/inertiajs/inertia-phoenix/issues/12))

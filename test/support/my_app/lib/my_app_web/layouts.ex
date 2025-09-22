@@ -1,7 +1,7 @@
-defmodule MyAppWeb.Layouts do
+defmodule MyApp.Web.Layouts do
   @moduledoc false
 
-  use MyAppWeb, :html
+  use MyApp.Web, :html
 
   embed_templates "layouts/*"
 end

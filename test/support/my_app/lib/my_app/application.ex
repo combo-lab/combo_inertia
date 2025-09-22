@@ -8,7 +8,7 @@ defmodule MyApp.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      MyAppWeb.Endpoint
+      MyApp.Web.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -21,7 +21,7 @@ defmodule MyApp.Application do
   # whenever the application is updated.
   @impl true
   def config_change(changed, _new, removed) do
-    MyAppWeb.Endpoint.config_change(changed, removed)
+    MyApp.Web.Endpoint.config_change(changed, removed)
     :ok
   end
 end
