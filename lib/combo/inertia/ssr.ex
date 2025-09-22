@@ -9,8 +9,6 @@ defmodule Combo.Inertia.SSR do
 
   require Logger
 
-  alias Combo.Inertia.SSR.Config
-
   @default_pool_size 4
   @default_module "ssr"
 
@@ -34,9 +32,11 @@ defmodule Combo.Inertia.SSR do
     module = Keyword.get(opts, :module, @default_module)
     pool_size = Keyword.get(opts, :pool_size, @default_pool_size)
 
+    supervisor_name = supervisor_name()
+    :persistent_term.put({supervisor_name, :module}, module)
+
     children = [
-      {Config, module: module},
-      {NodeJS.Supervisor, name: supervisor_name(), path: path, pool_size: pool_size}
+      {NodeJS.Supervisor, name: supervisor_name, path: path, pool_size: pool_size}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
@@ -44,8 +44,10 @@ defmodule Combo.Inertia.SSR do
 
   @doc false
   def call(page) do
-    module = GenServer.call(Config, :module)
-    NodeJS.call({module, :render}, [page], name: supervisor_name(), binary: true)
+    supervisor_name = supervisor_name()
+    module = :persistent_term.get({supervisor_name, :module})
+
+    NodeJS.call({module, :render}, [page], name: supervisor_name, binary: true)
   end
 
   defp supervisor_name do
