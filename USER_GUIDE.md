@@ -1,10 +1,10 @@
 # User Guide
 
-The following documentation discusses how to manually install and configure Inertia for a combo project.
+This documentation introduces how to manually install and configure Inertia for a combo project.
 
-In following content, we'll use React, but the process is similar for other Inertia-compatible frameworks, like Vue or Svelte.
+Before we begin, we need to choose the frontend framework to use. Here we'll use React, but the process is similar for other Inertia-compatible frameworks, like Vue or Svelte.
 
-> However, Combo's project generator - [combo_new](https://github.com/combo-lab/combo_new), already includes all of this scaffolding and are the fastest way to get started with Combo and Inertia.
+> Combo's project generator - [combo_new](https://github.com/combo-lab/combo_new), already includes all of this scaffolding and are the fastest way to get started with Combo and Inertia.
 
 ## Installation
 
@@ -16,6 +16,8 @@ $ mix combo_new frontend-vite my_app
 
 ### Server-side setup
 
+#### Installing dependencies
+
 Add `:combo_inertia` to the list of dependencies in `mix.exs`:
 
 ```elixir
@@ -26,7 +28,9 @@ def deps do
 end
 ```
 
-This package includes a few modules to help rendering Inertia responses:
+#### Setting up necessary modules
+
+This package includes a few modules:
 
 - `Combo.Inertia.Plug` - the plug for detecting Inertia requests and preparing the connection accordingly.
 - `Combo.Inertia.Conn` - the `%Plug.Conn{}` helpers for rendering Inertia responses.
@@ -77,33 +81,36 @@ Then:
   end
 ```
 
-Next, modify the layout to:
+#### Modifying the root layout
 
-- replace the `<title>` tag in the layout with the `<.inertia_title>` component, so that the client-side library will keep the title in sync.
+- add `ssr` attribute to the `<html>` tag, which is supplied to client-side code to identify the current rendering mode.
+- replace the `<title>` tag with the `<.inertia_title>` component, which is used to keep the title in sync with client-side code.
 - add the `<.inertia_head>` component.
 
 ```diff
   # lib/my_app/web/layouts/root.html.ceex
   <!DOCTYPE html>
-  <html lang="en">
+- <html lang="en">
++ <html lang="en" ssr={@inertia_ssr?}>
     <head>
       <!-- ... -->
 -     <title>{assigns[:page_title]}</title>
 +     <.inertia_title>{assigns[:page_title]}</.inertia_title>
 +     <.inertia_head content={@inertia_head} />
 +     <.vite_react_refresh />
-+     <.vite_assets names={["src/js/app.jsx"]} />
+      <.vite_assets names={["src/js/app.jsx"]} />
     </head>
     <!-- ... -->
 ```
 
-> For React applications, it's recommended to include the `<.vite_react_refresh />` component before the `<.vite_assets />` component to enable Fast Refresh in development.
+> You may noticed that we add `<.vite_react_refresh />` component before the `<.vite_assets />` component.
+> It's provided by [`combo_vite`](https://github.com/combo-lab/combo_vite) for enabling fast refresh in development, and only for React.
 
-And, if you'd like to add configuration into `config.exs` file:
+#### Adding configuration
+
+If you'd like to add configuration, these configuration are available.
 
 ```elixir
-# config/config.exs
-
 config :my_app, MyApp.Web.Endpoint,
   inertia: [
     # An optional list of static file paths to track for changes. You'll generally
@@ -115,37 +122,41 @@ config :my_app, MyApp.Web.Endpoint,
     # assets using the `static_paths` config). Defaults to "1".
     default_version: "1",
 
-    # Enable automatic conversion of prop keys from snake case (e.g. `inserted_at`),
-    # which is conventional in Elixir, to camel case (e.g. `insertedAt`), which is
-    # conventional in JavaScript. Defaults to `false`.
+    #
+    assets_version:
+
+    # Instruct the client side whether to encrypt the page object in the window
+    # history state.
+    # Defaults to `false`.
+    encrypt_history: false,
+
+    # Enable automatic conversion of prop keys from snake case to camel case.
+    # Defaults to `false`.
     camelize_props: false,
 
-    # Instruct the client side whether to encrypt the page object in the window history
-    # state. This can also be set/overridden on a per-request basis, using the `encrypt_history`
-    # controller helper. Defaults to `false`.
-    history: [encrypt: false],
-
     # Enable server-side rendering for page responses (requires some additional setup,
-    # see instructions below). Defaults to `false`.
+    # see instructions below).
+    # Defaults to `false`.
     ssr: false,
 
-    # Whether to raise an exception when server-side rendering fails (only applies
-    # when SSR is enabled). Defaults to `true`.
-    #
-    # Recommended: enable in non-production environments and disable in production,
-    # so that SSR failures will not cause 500 errors (but instead will fallback to
-    # CSR).
-    raise_on_ssr_failure: config_env() != :prod
+    # Whether to raise an exception when server-side rendering fails.
+    # Defaults to `true`.
+    raise_on_ssr_failure: true
   ]
 ```
 
 ### Client-side setup
 
-#### Updating vite.config.js
+#### Configuring Vite for React
+
+Add `@vitejs/plugin-react`:
 
 ```
+$ cd assets
 $ npm install -D --install-links @vitejs/plugin-react
 ```
+
+Edit `assets/vite.config.js`:
 
 ```diff
   import { defineConfig } from "vite"
@@ -155,7 +166,8 @@ $ npm install -D --install-links @vitejs/plugin-react
   export default defineConfig({
     plugins: [
       combo({
-        input: ["src/js/app.jsx"],
+-       input: ["src/js/app.js"],
++       input: ["src/js/app.jsx"],
         staticDir: "../priv/static",
       }),
 +     react(),
@@ -166,6 +178,7 @@ $ npm install -D --install-links @vitejs/plugin-react
 #### Installing React and Inertia adapter
 
 ```
+$ cd assets
 $ npm install -S --install-links @inertiajs/react react react-dom
 ```
 
@@ -176,11 +189,11 @@ Next, rename `app.js` to `app.jsx` and update it to create your Inertia app:
 ```javascript
 // assets/src/js/app.jsx
 
+import "@fontsource-variable/instrument-sans"
+import "../css/app.css"
+
 import { createInertiaApp } from "@inertiajs/react"
 import { createRoot } from "react-dom/client"
-
-import axios from "axios"
-axios.defaults.xsrfHeaderName = "x-csrf-token"
 
 createInertiaApp({
   resolve: (name) => {
@@ -208,9 +221,42 @@ export default Dashboard() {
 }
 ```
 
+#### Setting up CSRF protection
+
+Axios is the HTTP library that Inertia uses under the hood. Axios automatically checks for the existence of an `XSRF-TOKEN` cookie.
+If it's present, it will then include the token in an `X-XSRF-TOKEN` header for any requests it makes.
+
+`Combo.Inertia` automatically sets the `XSRF-TOKEN` cookie used by the Axios.
+
+But, Combo expects to receive the CSRF token via the `x-csrf-token` header, hence we need to configure Axios to use that header name:
+
+```javascript
+// assets/src/js/app.jsx
+
+  import "@fontsource-variable/instrument-sans"
+  import "../css/app.css"
+
+  import { createInertiaApp } from "@inertiajs/react"
+  import { createRoot } from "react-dom/client"
+
++ import axios from "axios"
++ axios.defaults.xsrfHeaderName = "x-csrf-token"
+
+  createInertiaApp({
+    resolve: (name) => {
+      const page = `./Pages/${name}.jsx`
+      const pages = import.meta.glob("./Pages/**/*.jsx", { eager: true })
+      return pages[page]
+    },
+    setup({ el, App, props }) {
+      createRoot(el).render(<App {...props} />)
+    },
+  })
+```
+
 ## Rendering responses
 
-Rendering an Inertia.js response looks like this:
+Rendering an Inertia response looks like this:
 
 ```elixir
 defmodule MyApp.Web.ProfileController do
@@ -219,120 +265,17 @@ defmodule MyApp.Web.ProfileController do
   def index(conn, _params) do
     conn
     |> inertia_put_prop(:text, "Hello world")
-    |> inertia_render("ProfilePage")
+    |> inertia_render("Welcome")
   end
 end
-```
-
-The `inertia_put_prop` function allows you to define props that should be passed in to the component. The `inertia_render` function accepts the conn, the name of the component to render, and an optional map containing more initial props to pass to the page component.
-
-This action will render an HTML page containing a `<div>` element with the name of the component and the initial props, following Inertia.js conventions. On subsequent requests dispatched by the Inertia.js client library, this action will return a JSON response with the data necessary for rendering the page.
-
-If you want to automatically convert your prop keys from snake case (conventional in Elixir) to camel case to keep with JavaScript conventions (e.g. `first_name` to `firstName`), you can configure that globally or enable/disable it on a per-request basis.
-
-```elixir
-import Config
-
-config :my_app, MyAppWeb.Endpoint
-  inertia: [
-    camelize_props: true
-  ]
-```
-
-```elixir
-defmodule MyAppWeb.ProfileController do
-  use MyAppWeb, :controller
-
-  def index(conn, _params) do
-    conn
-    |> inertia_put_prop(:first_name, "Bob")
-    |> inertia_camelize_props()
-    |> inertia_render("ProfilePage")
-  end
-end
-```
-
-## Lazy data evaluation
-
-If you have expensive data for your props that may not always be required (that is, if you plan to use [partial reloads](https://inertiajs.com/partial-reloads)), you can wrap your expensive computation in a function and pass the function reference when setting your Inertia props. You may use either an anonymous function (or named function reference) and optionally wrap it with the `Combo.Inertia.Conn.inertia_optional/1` function.
-
-> [!NOTE] > `inertia_optional` props will _only_ be included the when explicitly requested in a partial
-> reload. If you want to include the prop on first visit, you'll want to use a
-> bare anonymous function or named function reference instead. See below for
-> examples of how prop assignment behaves.
-
-Here are some specific examples of how the methods of lazy data evaluation differ:
-
-```elixir
-conn
-# ALWAYS included on first visit...
-# OPTIONALLY included on partial reloads...
-# ALWAYS evaluated...
-|> inertia_put_prop(:cheap_thing, cheap_thing())
-
-# ALWAYS included on first visit...
-# OPTIONALLY included on partial reloads...
-# ONLY evaluated when needed...
-|> inertia_put_prop(:expensive_thing, fn -> calculate_thing() end)
-|> inertia_put_prop(:another_expensive_thing, &calculate_another_thing/0)
-
-# NEVER included on first visit...
-# OPTIONALLY included on partial reloads...
-# ONLY evaluated when needed...
-|> inertia_put_prop(:super_expensive_thing, inertia_optional(fn -> calculate_thing() end))
-```
-
-## Deferred props
-
-**Requires Inertia v2.x on the client-side**.
-
-If you have expensive data that you'd like to automatically fetch (from the client-side via an async background request) after the page is initially rendered, you can mark the prop as deferred:
-
-```elixir
-conn
-|> inertia_put_prop(:expensive_thing, inertia_defer(fn -> calculate_thing() end))
-```
-
-The `inertia_defer/1` helper accepts a function argument in the first position. You may optionally use the `inertia_defer/2` helper, which accepts a "group" name in the second position:
-
-```elixir
-conn
-|> inertia_put_prop(:expensive_thing, inertia_defer(fn -> calculate_thing() end, "dashboard"))
-```
-
-If no group names are specified, then the client-side will issue a single async request to fetch all the deferred props. If there are multiple group names, then the client-side will issue one async request per group instead. This is useful if you have some very expensive data that you'd prefer fetch in parallel alongside other expensive data.
-
-## Merge props
-
-**Requires Inertia v2.x on the client-side**.
-
-If you have prop data that should get merged with the existing data on the client-side on subsequent requests (for example, an array of paginated data being presented in an "infinite scroll" interface), then you can tag the prop value using the `inertia_merge/1` helper:
-
-```elixir
-conn
-|> inertia_put_prop(:paginated_list, inertia_merge(["a", "b", "c"]))
-```
-
-Merge props can also accept deferred props:
-
-```elixir
-conn
-|> inertia_put_prop(:paginated_list, inertia_defer(&calculate_next_page/0) |> inertia_merge())
-```
-
-If you are working with complex data structures or nested objects you can use `inertia_deep_merge(value)`
-
-```elixir
-conn
-|> inertia_put_prop(:complex_object, inertia_deep_merge(%{a: %{b: %{c: %{d: 1}}}}))
 ```
 
 ## Shared data
 
-To share data on every request, you can use the `inertia_put_prop/2` function inside of a shared plug in your response pipeline. For example, suppose you have a `UserAuth` plug responsible for fetching the currently-logged in user and you want to be sure all your Inertia components receive that user data. Your plug might look something like this:
+To share data on every request, you can use the `inertia_put_prop/3` function inside of a plug in your response pipeline. For example, suppose you have a `UserAuth` plug responsible for fetching the current user and you want to be sure all your Inertia components receive that user data. Your plug can be something like this:
 
 ```elixir
-defmodule MyApp.UserAuth do
+defmodule MyApp.Web.UserAuth do
   import Plug.Conn
   import Combo.Conn
   import Combo.Inertia.Conn
@@ -340,12 +283,9 @@ defmodule MyApp.UserAuth do
   def authenticate_user(conn, _opts) do
     user = get_user_from_session(conn)
 
-    # Here we are storing the user in the conn assigns (so
-    # we can use it for things like checking permissions later on),
-    # AND we are assigning a serialized represention of the user
-    # to our Inertia props.
     conn
     |> assign(:user, user)
+    # put a serialized represention of the user to Inertia props.
     |> inertia_put_prop(:user, serialize_user(user))
   end
 
@@ -353,59 +293,85 @@ defmodule MyApp.UserAuth do
 end
 ```
 
-Anywhere this plug is used, the serialized `user` prop will be passed to the Inertia component.
+Anywhere this plug is used, the serialized `user` prop will be passed to the Inertia components.
 
-## Validations
+## Lazy data evaluation
 
-Validation errors follow some specific conventions to make wiring up with Inertia's form helpers seamless. The `errors` prop is managed by this library and is always included in the props object for Inertia components. (When there are no errors, the `errors` prop will be an empty object).
+- `Combo.Inertia.Conn.inertia_optional/1`
+- `Combo.Inertia.Conn.inertia_always/1`
 
-The `assign_errors` function is how you tell Inertia what errors should be represented on the front-end. By default, you can either pass an `Ecto.Changeset` struct or a bare map to the `assign_errors` function. For other error data types, you may implement the `Combo.Inertia.Errors` protocol (see the `Combo.Inertia.Errors` module docs for more information).
+## Deferred props
+
+- `Combo.Inertia.Conn.inertia_defer/1`
+- `Combo.Inertia.Conn.inertia_defer/2`
+
+## Merging props
+
+- `Combo.Inertia.Conn.inertia_merge/1`
+- `Combo.Inertia.Conn.inertia_deep_merge/1`
+
+## History encryption
+
+### Global encryption
+
+To enable history encryption globally, use:
 
 ```elixir
-def update(conn, params) do
-  case MyApp.Settings.update(params) do
-    {:ok, _settings} ->
-      conn
-      |> put_flash(:info, "Settings updated")
-      |> redirect(to: ~p"/settings")
+config :my_app, MyApp.Web.Endpoint,
+  inertia: [
+    encrypt_history: true
+  ]
+```
 
-    {:error, changeset} ->
-      conn
-      |> assign_errors(changeset)
-      |> redirect(to: ~p"/settings")
+### Per-request encryption
+
+To encrypt the history of an individual request, use:
+
+- `Combo.Inertia.Conn.inertia_encrypt_history/1`
+- `Combo.Inertia.Conn.inertia_encrypt_history/2`
+
+### Clearing history
+
+To clear the history state, use:
+
+- `Combo.Inertia.Conn.inertia_clear_history/1`
+- `Combo.Inertia.Conn.inertia_clear_history/2`
+
+## Distinctive features
+
+### Camelizing props
+
+Combo.Inertia allows to automatically convert your prop keys from snake case (conventional in Elixir) to camel case (conventional in JavaScript), like `first_name` to `firstName`.
+
+To configure it globally:
+
+```elixir
+import Config
+
+config :my_app, MyApp.Web.Endpoint
+  inertia: [
+    camelize_props: true
+  ]
+```
+
+To configure it on a per-request basis.
+
+```elixir
+defmodule MyApp.Web.ProfileController do
+  use MyApp.Web, :controller
+
+  def index(conn, _params) do
+    conn
+    |> inertia_put_prop(:first_name, "Bob")
+    |> inertia_camelize_props()
+    |> inertia_render("Welcome")
   end
 end
 ```
 
-The `assign_errors` function will automatically convert the changeset errors into a shape compatible with the client-side adapter. Since Inertia.js expects a flat map of key-value pairs, the error serializer will flatten nested errors down to compound keys:
+### Flash messages
 
-```javascript
-{
-  "name" => "can't be blank",
-
-  // Nested errors keys are flattened with a dot separator (`.`)
-  "team.name" => "must be at least 3 characters long",
-
-  // Nested arrays are zero-based and indexed using bracket notation (`[0]`)
-  "items[1].price" => "must be greater than 0"
-}
-```
-
-Errors are automatically preserved across redirects, so you can safely respond with a redirect back to page where the form lives to display form errors.
-
-If you need to construct your own map of errors (rather than pass in a changeset), be sure it's a flat mapping of atom (or string) keys to string values like this:
-
-```elixir
-conn
-|> assign_errors(%{
-  name: "Name can't be blank",
-  password: "Password must be at least 5 characters"
-})
-```
-
-## Flash messages
-
-This library automatically includes Phoenix flash data in Inertia props, under the `flash` key.
+`Combo.Inertia` automatically includes Combo flash data in Inertia props, under the `flash` key.
 
 For example, given the following controller action:
 
@@ -425,7 +391,7 @@ def update(conn, params) do
 end
 ```
 
-When Inertia (or the browser) redirects to the `/settings` page, the Inertia component will receive the flash props:
+When redirecting to the `/settings` page, the Inertia component will receive the `flash` prop:
 
 ```javascript
 {
@@ -439,86 +405,62 @@ When Inertia (or the browser) redirects to the `/settings` page, the Inertia com
 }
 ```
 
-## CSRF protection
+### Validations
 
-This library automatically sets the `XSRF-TOKEN` cookie for use by the Axios client on the front-end. Since Phoenix expects to receive the CSRF token via the `x-csrf-token` header, you'll need to configure Axios in your front-end JavaScript to use that header name:
+Validation errors follow some specific conventions to make wiring up with Inertia's form helpers seamless. The `errors` prop is managed by `Combo.Inertia` and is always included in the props object for Inertia components. (When there are no errors, the `errors` prop will be an empty object).
+
+The `inertia_put_errors` function is how you tell Inertia what errors should be represented on the front-end. By default, you can either pass an `Ecto.Changeset` struct or a bare map to it. For other error data types, you may implement the `Combo.Inertia.Errors` protocol:
+
+```elixir
+def update(conn, params) do
+  case MyApp.Settings.update(params) do
+    {:ok, _settings} ->
+      conn
+      |> put_flash(:info, "Settings updated")
+      |> redirect(to: ~p"/settings")
+
+    {:error, changeset} ->
+      conn
+      |> inertia_put_errors(changeset)
+      |> redirect(to: ~p"/settings")
+  end
+end
+```
+
+The `inertia_put_errors` function will convert the changeset errors into a shape compatible with the client-side adapter. Since Inertia expects a flat map of key-value pairs, the error serializer will flatten nested errors down to compound keys:
 
 ```javascript
-// assets/js/app.js
+{
+  "name" => "can't be blank",
 
-import axios from "axios"
-axios.defaults.xsrfHeaderName = "x-csrf-token"
+  // Nested errors keys are flattened with a dot separator (`.`)
+  "team.name" => "must be at least 3 characters long",
 
-// the rest of your Inertia client code...
+  // Nested arrays are zero-based and indexed using bracket notation (`[0]`)
+  "items[1].price" => "must be greater than 0"
+}
 ```
 
-## History
+Errors are automatically preserved across redirects, so you can safely respond with a redirect back to page where the form lives to display form errors.
 
-**Requires Inertia v2.x on the client-side**.
-
-### Encryption
-
-If your page props contain sensitive data (such as information about the currently-authenticated user), you can opt to encrypt the history data that's cached in the browser.
+If you need to construct your own map of errors (rather than pass in a changeset), be sure it's a flat mapping of atom (or string) keys to string values like this:
 
 ```elixir
 conn
-|> inertia_encrypt_history()
-```
-
-You can also enable history encryption globally in your application config:
-
-```elixir
-config :inertia,
-  history: [encrypt: true]
-```
-
-### Clearing history
-
-To instruct the client to clear this history (for example, when a user logs out), you can use the `clear_history/1` helper when building your response.
-
-```elixir
-conn
-|> inertia_clear_history()
+|> inertia_put_errors(%{
+  name: "Name can't be blank",
+  password: "Password must be at least 5 characters"
+})
 ```
 
 ## Testing
 
-The `Combo.Inertia.Testing` module includes helpers for testing your Inertia controller responses, such as the `inertia_component/1` and `inertia_props/1` functions.
+- `Combo.Inertia.Testing`
+
+We recommend importing `Combo.Inertia.Testing` in your `ConnCase` helper:
 
 ```elixir
-use MyAppWeb.ConnCase
-
-import Combo.Inertia.Testing
-
-describe "GET /" do
-  test "renders the home page", %{conn: conn} do
-    conn = get("/")
-    assert inertia_component(conn) == "Home"
-    assert %{user: %{id: 1}} = inertia_props(conn)
-  end
-end
-```
-
-```elixir
-use MyAppWeb.ConnCase
-
-import Combo.Inertia.Testing
-
-describe "POST /users" do
-  test "fails when name empty", %{conn: conn} do
-    conn = post("/users", %{"name" => ""})
-
-    assert %{user: %{id: 1}} = inertia_props(conn)
-    assert redirected_to(conn) == ~p"/users"
-    assert inertia_errors(conn) == %{"name" => "can't be blank"}
-  end
-end
-```
-
-We recommend importing `Combo.Inertia.Testing` in your `ConnCase` helper, so that it will be at the ready for all your controller tests:
-
-```elixir
-defmodule MyApp.ConnCase do
+defmodule MyApp.Web.ConnCase do
   use ExUnit.CaseTemplate
 
   using do
@@ -533,14 +475,15 @@ end
 
 ## Server-side rendering
 
-Inertia.js comes with with server-side rendering (SSR) support.
+Inertia comes with with server-side rendering (SSR) support.
 
-> [!NOTE]
-> The steps for enabling SSR in Combo are similar to other backend frameworks, but instead of running a separate Node.js server process to render HTML, this package spins up a pool of Node.js process workers to handle SSR calls and manages the state of those node processes from your Elixir process tree. This is mostly just an implementation detail that you don't need to be concerned about, but we'll highlight how our `ssr.js` script differs from the Inertia.js docs.
+> The steps for enabling SSR similar to other backend frameworks, but instead of running a separate Node.js server process to render HTML, `Combo.Inertia` spins up a pool of Node.js process workers to handle SSR calls and manages the state of those node processes from your Elixir process tree. This is mostly just an implementation detail that you don't need to be concerned about, but we'll highlight how our `ssr.js` script differs from the Inertia docs.
 
-### Adding an SSR module
+### Client-side setup
 
-You'll need to create a JavaScript module that exports a `render` function to perform the actual server-side rendering of pages. Let's name it `ssr.jsx`.
+#### Adding the SSR entrypoint
+
+Create a Node.js module that exports a `render` function to perform the actual server-side rendering of pages. Let's name it `ssr.jsx`.
 
 ```javascript
 // assets/src/js/ssr.jsx
@@ -564,179 +507,173 @@ export function render(page) {
 
 > This is similar to the server entry-point [documented here](https://inertiajs.com/server-side-rendering#add-server-entry-point), except we are simply exporting a function called `render`, instead of starting a Node.js server process.
 
-HERE
+#### Configuring Vite for the SSR entrypoint
 
-Next, configure esbuild to compile the `ssr.jsx` bundle.
-
-```diff
-+   ssr: [
-+     args: ~w(js/ssr.jsx --bundle --platform=node --outdir=../priv --format=cjs),
-+     cd: Path.expand("../assets", __DIR__),
-+     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
-+   ]
-```
-
-Add the `ssr` build to the watchers in your dev environment, alongside the other asset watchers:
+Configure vite to build `assets/src/js/ssr.jsx`, and put the bundled `ssr.js` into `priv/ssr`.
 
 ```diff
-  # config/dev.exs
-  config :my_app, MyAppWeb.Endpoint,
-    # Binding to loopback ipv4 address prevents access from other machines.
-    # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-    http: [ip: {127, 0, 0, 1}, port: 4000],
-    check_origin: false,
-    code_reloader: true,
-    debug_errors: true,
-    secret_key_base: "4Z2yyTu6Uy8AM+MguG3oldEf4aIdswR2BsCm1OtqDK0lEv++T02KktRaXfMbC/Zs",
-    watchers: [
-      esbuild: {Esbuild, :install_and_run, [:app, ~w(--sourcemap=inline --watch)]},
-+     ssr: {Esbuild, :install_and_run, [:ssr, ~w(--sourcemap=inline --watch)]},
-      tailwind: {Tailwind, :install_and_run, [:my_app, ~w(--watch)]}
-    ]
+  import { defineConfig } from "vite"
+  import combo from "vite-plugin-combo"
+  import react from "@vitejs/plugin-react"
+
+  export default defineConfig({
+    plugins: [
+      combo({
+        input: ["src/js/app.jsx"],
+        staticDir: "../priv/static",
++       ssrInput: ["src/js/ssr.jsx"],
++       ssrOutDir: "../priv/ssr",
+      }),
+      react(),
+    ],
+  })
 ```
 
-Add the `ssr` build step to the asset build and deploy scripts.
+#### Modifying the CSR entrypoint
+
+When SSR is enabled, `hydrateRoot` should be used.
 
 ```diff
-  # mix.exs
+  import "@fontsource-variable/instrument-sans"
+  import "../css/app.css"
 
-  defp aliases do
-    [
-      setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
--     "assets.build": ["tailwind app", "esbuild app"],
-+     "assets.build": ["tailwind app", "esbuild app", "esbuild ssr"],
-      "assets.deploy": [
-        "tailwind app --minify",
-        "esbuild app --minify",
-+       "esbuild ssr",
-        "phx.digest"
-      ]
-    ]
-  end
+  import { createInertiaApp } from "@inertiajs/react";
+  import { createRoot, hydrateRoot } from "react-dom/client";
+  import { resolvePageComponent } from "./inertia-helper";
+
+  import axios from "axios";
+  axios.defaults.xsrfHeaderName = "x-csrf-token";
+
++ function ssr_mode() {
++   return document.documentElement.hasAttribute("ssr");
++ }
+
+  createInertiaApp({
+    resolve: (name) => {
+      const page = `./Pages/${name}.jsx`
+      const pages = import.meta.glob("./Pages/**/*.jsx", { eager: true })
+      return pages[page]
+    },
+    setup({ el, App, props }) {
+-     createRoot(el).render(<App {...props} />)
++     if (ssr_mode()) {
++       hydrateRoot(el, <App {...props} />);
++     } else {
++       createRoot(el).render(<App {...props} />)
++     }
+    },
+  })
+
+createInertiaApp({
+  resolve: (name) => resolvePageComponent(
+    `./Pages/${name}.jsx`,
+    import.meta.glob('./Pages/**/*.jsx', { eager: true })
+  ),
+  setup({ el, App, props }) {
+
+  },
+});
 ```
 
-As configured, this will place the generated `ssr.js` bundle into the `priv` directory. Since it's generated code, add it to your `.gitignore` file.
+#### Updating npm script
+
+Update the `build` script in `package.json` to build the new `ssr.js` file.
+
+```diff
+ "scripts": {
+    "dev": "vite",
+-   "build": "vite build",
++   "build": "vite build && vite build --ssr",
+    // ...
+  },
+```
+
+Now you can build both your client-side and server-side bundles.
+
+```
+$ npm run build
+```
+
+#### Updating .gitignore
+
+Since `priv/ssr/` is for generated file, add it to your `.gitignore` file.
 
 ```diff
   # .gitignore
 
-+ /priv/ssr.js
++ /priv/ssr/
 ```
 
-### Configuring your app for server-rendering
+### Server-side setup
 
-Now that you have a Node.js module capable of server-rendering your pages, youll need to tell the Inertia.js Phoenix library to perform SSR.
+#### Setting up `Combo.Inertia.SSR`
 
-First, add the `Combo.Inertia.SSR` module to your application's supervision tree.
+First, add the `Combo.Inertia.SSR` module to the of supervision tree:
 
-```diff
-  # lib/my_app/application.ex
+```elixir
+# lib/my_app/web/supervisor.ex
 
-  defmodule MyApp.Application do
-    use Application
+defmodule MyApp.Web.Supervisor do
+  use Supervisor
 
-    @impl true
-    def start(_type, _args) do
-      children = [
-        # ...
-+       # Start the SSR process pool
-+       # You must specify a `path` option to locate the directory where the `ssr.js` file lives.
-+       {Combo.Inertia.SSR, path: Path.join([Application.app_dir(:my_app), "priv"])},
+  @spec start_link(term()) :: Supervisor.on_start()
+  def start_link(arg) do
+    Supervisor.start_link(__MODULE__, arg, name: __MODULE__)
+  end
 
-        # Start to serve requests, typically the last entry
-        MyAppWeb.Endpoint,
+  @impl Supervisor
+  def init(_arg) do
+    children =
+      Enum.concat(
+        inertia_children(),
+        [
+          MyApp.Web.Endpoint
+        ]
+      )
+
+    Supervisor.init(children, strategy: :one_for_one)
+  end
+
+  defp inertia_children do
+    config = Application.get_env(:my_app, MyApp.Web.Endpoint)
+    ssr? = get_in(config, [:inertia, :ssr])
+
+    if ssr? do
+      [
+        {Combo.Inertia.SSR, path: Path.join([Application.app_dir(:my_app), "priv/ssr"])}
       ]
+    else
+      []
+    end
+  end
+end
 ```
 
-Then, update your config to enable SSR (if you'd like to enable it globally).
+Then, update your config to enable SSR for production environment:
 
-```diff
-  # config/config.exs
-
-  config :inertia,
-    # The Phoenix Endpoint module for your application. This is used for building
-    # asset URLs to compute a unique version hash to track when something has
-    # changed (and a reload is required on the frontend).
-    endpoint: MyAppWeb.Endpoint,
-
-    # An optional list of static file paths to track for changes. You'll generally
-    # want to include any JavaScript assets that may require a page refresh when
-    # modified.
-    static_paths: ["/assets/app.js"],
-
-    # The default version string to use (if you decide not to track any static
-    # assets using the `static_paths` config). Defaults to "1".
-    default_version: "1",
-
-    # Enable server-side rendering for page responses (requires some additional setup,
-    # see instructions below). Defaults to `false`.
--   ssr: false
-+   ssr: true
-
-    # Whether to raise an exception when server-side rendering fails (only applies
-    # when SSR is enabled). Defaults to `true`.
-    #
-    # Recommended: enable in non-production environments and disable in production,
-    # so that SSR failures will not cause 500 errors (but instead will fallback to
-    # CSR).
-    raise_on_ssr_failure: config_env() != :prod
+```elixir
+# config/prod.exs
+config :my_app, MyApp.Web.Endpoint,
+  inertia: [
+    ssr: true
+  ]
 ```
 
-### Installing Node.js in your production
+## Deployment
 
-You need to have Node.js installed in your production server environment, so that we can call the SSR script when serving pages. These steps assume you are deploying your application using a Dockerfile and releases.
+There's only one thing to note - make Node.js running in production mode, which is configured by setting following environment variable:
 
-If you haven't installed node into your runner image, add the following command to your Dockerfile (after the `FROM ${RUNNER_IMAGE}` step).
-
-```diff
-  FROM ${RUNNER_IMAGE}
-
-  # install curl (and a few other packages)
-  RUN apt-get update -y && \
--     apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates && \
-+     apt-get install -y libstdc++6 openssl curl libncurses5 locales ca-certificates && \
-      apt-get clean && rm -f /var/lib/apt/lists/*_*
-
-  # install Node.js
-+ RUN curl -fsSL https://deb.nodesource.com/setup_x.x | bash - && \
-+    apt-get update && \
-+    apt-get install -y nodejs
-
-  # ...
-
-  ENV MIX_ENV="prod"
-
-  # ensure node is running in production mode
-+ ENV NODE_ENV="production"
+```
+NODE_ENV="production"
 ```
 
-> [!IMPORTANT] > **Be sure to set `NODE_ENV=production`**, so that the SSR script is cached in memory. Otherwise, your page rendering times will be very slow!
+Why? Node.js running in production mode will cache the SSR module in memory. Otherwise, SSR will be sluggish.
 
-### Client side hydration
+> Performance comparison for rendering a simple page when testing on an M1 MacBook Pro:
+>
+> - Node.js running in production mode - `8ms`
+> - Node.js running in non-production mode - `80ms`
 
-[Follow the instructions from the Inertia.js docs](https://inertiajs.com/server-side-rendering#client-side-hydration) for updating your client-side code to hydrate the pre-rendered HTML coming from the server.
+## More
 
-Using our example React script from above, the adaptation looks like this:
-
-```diff
-  // assets/js/app.jsx
-
-  import React from "react";
-  import { createInertiaApp } from "@inertiajs/react";
-- import { createRoot } from "react-dom/client";
-+ import { hydrateRoot } from "react-dom/client";
-
-  createInertiaApp({
-    resolve: async (name) => {
-      return await import(`./pages/${name}.jsx`);
-    },
-    setup({ App, el, props }) {
--     createRoot(el).render(<App {...props} />);
-+     hydrateRoot(el, <App {...props} />);
-    },
-  });
-```
+Visit <https://inertiajs.com/>.

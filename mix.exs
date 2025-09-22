@@ -48,7 +48,7 @@ defmodule Combo.Inertia.MixProject do
 
   defp docs do
     [
-      extras: ["README.md", "CHANGELOG.md", "LICENSE"],
+      extras: ["README.md", "USER_GUIDE.md", "CHANGELOG.md", "LICENSE"],
       main: "readme",
       source_url: @source_url,
       source_ref: "v#{@version}"
