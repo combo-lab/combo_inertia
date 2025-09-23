@@ -91,7 +91,7 @@ Then:
   # lib/my_app/web/layouts/root.html.ceex
   <!DOCTYPE html>
 - <html lang="en">
-+ <html lang="en" ssr={@inertia_ssr?}>
++ <html lang="en" ssr={@inertia_ssr}>
     <head>
       <!-- ... -->
 -     <title>{assigns[:page_title]}</title>

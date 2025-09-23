@@ -26,7 +26,7 @@ defmodule Combo.Inertia.Plug do
 
     conn
     |> assign(:inertia_head, [])
-    |> assign(:inertia_ssr?, global_ssr?(endpoint))
+    |> assign(:inertia_ssr, global_ssr?(endpoint))
     |> put_private(:inertia_version, compute_version(endpoint))
     |> inertia_encrypt_history(global_encrypt_history?(endpoint))
     |> inertia_clear_history(false)
