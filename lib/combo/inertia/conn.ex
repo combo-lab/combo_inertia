@@ -594,14 +594,13 @@ defmodule Combo.Inertia.Conn do
     conn
     |> put_view(html: Combo.Inertia.HTML)
     |> compile_head(head)
-    |> assign(:body, body)
-    |> render(:inertia_ssr)
+    |> render(:ssr_content, %{body: body})
   end
 
   defp send_csr_response(conn) do
     conn
     |> put_view(html: Combo.Inertia.HTML)
-    |> render(:inertia_page, %{page: build_page_object(conn)})
+    |> render(:csr_content, %{page: build_page_object(conn)})
   end
 
   # see https://inertiajs.com/the-protocol#the-page-object

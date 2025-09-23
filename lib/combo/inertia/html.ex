@@ -62,16 +62,15 @@ defmodule Combo.Inertia.HTML do
   end
 
   @doc false
-  # Renders a `<div>` element with an `id` of `app`. This element serves as the
-  # mounting point for the JavaScript application.
-  def inertia_page(assigns) do
+  # This <div> element serves as the mounting point for the JavaScript application.
+  def csr_content(assigns) do
     ~CE"""
     <div id="app" data-page={Combo.json_module().encode!(@page)}></div>
     """
   end
 
   @doc false
-  def inertia_ssr(assigns) do
+  def ssr_content(assigns) do
     ~CE"""
     {raw(@body)}
     """
