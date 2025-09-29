@@ -31,7 +31,7 @@ defmodule Combo.Inertia.MixProject do
 
   defp deps do
     [
-      {:combo, "~> 0.2"},
+      {:combo, path: "../combo"},
       {:plug, "~> 1.14"},
       {:floki, ">= 0.30.0", only: :test},
       {:nodejs, "~> 3.0"},

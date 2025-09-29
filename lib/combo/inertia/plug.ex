@@ -16,6 +16,7 @@ defmodule Combo.Inertia.Plug do
     ]
 
   alias Combo.Inertia.Config
+  alias Combo.Inertia.Cache
 
   def init(opts) do
     opts
@@ -159,6 +160,48 @@ defmodule Combo.Inertia.Plug do
 
   defp external_redirect?(_conn), do: false
 
+  @default_version "1"
+  defp compute_version(endpoint) do
+    Cache.get(endpoint, :assets_version, fn -> {:ok, auto_detect_assets_version(endpoint)} end)
+  end
+
+  defp auto_detect_assets_version(endpoint) do
+    case global_assets_version(endpoint) do
+      :auto ->
+        cond do
+          hash = vite_manifest_hash(endpoint) -> hash
+          hash = combo_static_manifest_hash(endpoint) -> hash
+          true -> @default_version
+        end
+
+      {module, fun, args} ->
+        apply(module, fun, args)
+
+      binary when is_binary(binary) ->
+        binary
+    end
+  end
+
+  # TODO: improve the hardcode
+  defp vite_manifest_hash(endpoint) do
+    path = Application.app_dir(endpoint.config(:otp_app), "priv/static/build/manifest.json")
+    if File.exists?(path), do: hash(path), else: nil
+  end
+
+  # TODO: improve the hardcode
+  defp combo_static_manifest_hash(endpoint) do
+    path = Application.app_dir(endpoint.config(:otp_app), "priv/static/manifest.digest.json")
+    if File.exists?(path), do: hash(path), else: nil
+  end
+
+  defp hash(path) do
+    path
+    |> File.read!()
+    |> :erlang.phash2()
+    |> to_string()
+    |> Base.encode64()
+  end
+
   # see: https://inertiajs.com/the-protocol#asset-versioning
   defp check_version(%{private: %{inertia_version: current_version}} = conn) do
     if conn.method == "GET" && get_req_header(conn, "x-inertia-version") != [current_version] do
@@ -166,22 +209,6 @@ defmodule Combo.Inertia.Plug do
     else
       conn
     end
-  end
-
-  defp compute_version(endpoint) do
-    static_paths = static_paths(endpoint)
-
-    if static_paths != [] do
-      hash_static_paths(endpoint, static_paths)
-    else
-      default_version(endpoint)
-    end
-  end
-
-  defp hash_static_paths(endpoint, paths) do
-    paths
-    |> Enum.map_join(&endpoint.static_path(&1))
-    |> then(&Base.encode16(:crypto.hash(:md5, &1), case: :lower))
   end
 
   defp force_refresh(conn) do
@@ -212,12 +239,8 @@ defmodule Combo.Inertia.Plug do
     end
   end
 
-  defp static_paths(endpoint) do
-    Config.get(endpoint, :static_paths, [])
-  end
-
-  defp default_version(endpoint) do
-    Config.get(endpoint, :default_version, "1")
+  defp global_assets_version(endpoint) do
+    Config.get(endpoint, :assets_version, :auto)
   end
 
   defp global_encrypt_history?(endpoint) do

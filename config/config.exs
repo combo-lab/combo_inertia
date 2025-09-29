@@ -9,8 +9,7 @@ config :combo_inertia, MyApp.Web.Endpoint,
   ],
   pubsub_server: MyApp.PubSub,
   inertia: [
-    static_paths: ["/assets/app.js"],
-    default_version: "1",
+    assets_version: :auto,
     camelize_props: false
   ]
 

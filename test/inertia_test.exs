@@ -6,7 +6,7 @@ defmodule InertiaTest do
   alias Combo.SafeHTML
   alias Combo.Inertia.Config
 
-  @current_version "db137d38dc4b6ee57d5eedcf0182de8a"
+  @current_version "MzQ3MzE2OA=="
 
   defp put_config(key, value) do
     Config.put(MyApp.Web.Endpoint, key, value)
@@ -71,7 +71,7 @@ defmodule InertiaTest do
     body = html_response(conn, 200)
 
     assert body =~ ~s("component":"Home") |> html_escape()
-    assert body =~ ~s("version":"db137d38dc4b6ee57d5eedcf0182de8a") |> html_escape()
+    assert body =~ ~s("version":"MzQ3MzE2OA==") |> html_escape()
   end
 
   test "tags the <title> tag with inertia", %{conn: conn} do
