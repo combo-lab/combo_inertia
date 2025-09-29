@@ -30,8 +30,13 @@ defmodule Combo.Inertia.MixProject do
   end
 
   defp deps do
+    combo =
+      if System.get_env("USE_LOCAL_DEPS"),
+        do: {:combo, path: "../combo", override: true},
+        else: {:combo, "~> 0.2"}
+
     [
-      {:combo, path: "../combo"},
+      combo,
       {:plug, "~> 1.14"},
       {:floki, ">= 0.30.0", only: :test},
       {:nodejs, "~> 3.0"},
