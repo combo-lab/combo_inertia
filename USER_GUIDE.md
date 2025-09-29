@@ -11,7 +11,7 @@ Before we begin, we need to choose the frontend framework to use. Here we'll use
 ### Generating a project using Vite
 
 ```
-$ mix combo_new frontend-vite my_app
+$ mix combo_new vite my_app
 ```
 
 ### Server-side setup
