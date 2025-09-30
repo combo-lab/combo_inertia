@@ -10,6 +10,8 @@ Before we begin, we need to choose the frontend framework to use. Here we'll use
 
 ### Generating a project using Vite
 
+When using Inertia, it's best to use it in conjunction with modern assets build tools like Vite. To get started quickly, let's create a project from `vite` template provided by `combo_new`:
+
 ```
 $ mix combo_new vite my_app
 ```
