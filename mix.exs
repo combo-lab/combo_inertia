@@ -66,7 +66,15 @@ defmodule Combo.Inertia.MixProject do
       links: %{
         GitHub: @source_url,
         Changelog: @changelog_url
-      }
+      },
+      files: ~w(
+        lib/
+        mix.exs
+        README.md
+        USER_GUIDE.md
+        CHANGELOG.md
+        LICENSE
+      )
     ]
   end
 
