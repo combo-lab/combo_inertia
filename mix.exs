@@ -33,7 +33,7 @@ defmodule Combo.Inertia.MixProject do
     combo =
       if System.get_env("USE_LOCAL_DEPS"),
         do: {:combo, path: "../combo", override: true},
-        else: {:combo, "~> 0.2"}
+        else: {:combo, "~> 0.3"}
 
     [
       combo,
