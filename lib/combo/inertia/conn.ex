@@ -389,7 +389,7 @@ defmodule Combo.Inertia.Conn do
   destination URL in the `x-inertia-location` header, which will cause the
   Inertia client to perform a `window.location = url` visit.
 
-  **Note**: we automatically convert regular external redirects (via the Phoenix
+  **Note**: we automatically convert regular external redirects (via the Combo
   `redirect` helper), but this function is useful if you need to force redirect
   to a non-external route that is not handled by Inertia.
 
