@@ -672,7 +672,10 @@ There's only one thing to note - make Node.js running in production mode, which 
 NODE_ENV="production"
 ```
 
-Why? Node.js running in production mode will cache the SSR module in memory. Otherwise, SSR will be sluggish, and memory leaks may occur.
+Why? In short:
+
+- To get best SSR performance. Node.js running in production mode will cache the SSR module in memory.
+- To avoid memory leaks.
 
 > Performance comparison for rendering a simple page when testing on an M1 MacBook Pro:
 >
