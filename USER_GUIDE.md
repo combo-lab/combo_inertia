@@ -484,6 +484,8 @@ Inertia comes with with server-side rendering (SSR) support.
 
 > The steps for enabling SSR similar to other backend frameworks, but instead of running a separate Node.js server process to render HTML, `Combo.Inertia` spins up a pool of Node.js process workers to handle SSR calls and manages the state of those node processes from your Elixir process tree. This is mostly just an implementation detail that you don't need to be concerned about, but we'll highlight how our `ssr.js` script differs from the Inertia docs.
 
+> To run Combo and a Node.js process pool with 1 process, you need at least 512MiB of memory. Otherwise, the machine may experience out-of-memory (OOM) errors or severe slowness.
+
 ### Client-side setup
 
 #### Adding the SSR entrypoint
