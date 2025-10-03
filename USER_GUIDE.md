@@ -212,7 +212,21 @@ createInertiaApp({
 })
 ```
 
-The `resolve` callback tells Inertia how to load a page component. It receives a page name as string, and returns a page component module. By default we recommend eager loading your components, which will result in a single JavaScript bundle. However, if you'd like to lazy-load your components, you can simply omit the `{ eager: true }` option, or set `{eager: false}`, to disable eager loading. See [the code splitting documentation of Inertia](https://inertiajs.com/code-splitting) for more information.
+The `resolve` callback tells Inertia how to load a page component. It receives a page name as string, and returns a page component module. By default we recommend eager loading your components, which will result in a single JavaScript bundle. However, if you'd like to lazy-load your components, you can modify the `resolve` callback like this:
+
+```javascript
+{
+  // ...
+  resolve: (name) => {
+    const page = `./pages/${name}.jsx`
+    const pages = import.meta.glob("./pages/**/*.jsx") // remove the {eager: true} option
+    return pages[page]() // add parentheses at the end
+  }
+  // ...
+}
+```
+
+See [the code splitting documentation of Inertia](https://inertiajs.com/code-splitting) for more information.
 
 The `setup` callback receives everything necessary to initialize the client-side framework, including the root Inertia `App` component.
 
