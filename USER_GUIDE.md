@@ -202,8 +202,8 @@ import { createRoot } from "react-dom/client"
 
 createInertiaApp({
   resolve: (name) => {
-    const page = `./Pages/${name}.jsx`
-    const pages = import.meta.glob("./Pages/**/*.jsx", { eager: true })
+    const page = `./pages/${name}.jsx`
+    const pages = import.meta.glob("./pages/**/*.jsx", { eager: true })
     return pages[page]
   },
   setup({ el, App, props }) {
@@ -216,10 +216,10 @@ The `resolve` callback tells Inertia how to load a page component. It receives a
 
 The `setup` callback receives everything necessary to initialize the client-side framework, including the root Inertia `App` component.
 
-The above code assumes your pages live in the `assets/src/js/Pages` directory and have a default export with page component, like this:
+The above code assumes your pages live in the `assets/src/js/pages` directory and have a default export with page component, like this:
 
 ```javascript
-// assets/js/src/Pages/Dashboard.jsx
+// assets/js/src/pages/Dashboard.jsx
 
 export default Dashboard() {
   return <div>{/* ... page contents ...*/}</div>
@@ -249,8 +249,8 @@ But, Combo expects to receive the CSRF token via the `x-csrf-token` header, henc
 
   createInertiaApp({
     resolve: (name) => {
-      const page = `./Pages/${name}.jsx`
-      const pages = import.meta.glob("./Pages/**/*.jsx", { eager: true })
+      const page = `./pages/${name}.jsx`
+      const pages = import.meta.glob("./pages/**/*.jsx", { eager: true })
       return pages[page]
     },
     setup({ el, App, props }) {
@@ -503,8 +503,8 @@ export function render(page) {
     page,
     render: ReactDOMServer.renderToString,
     resolve: (name) => {
-      const page = `./Pages/${name}.jsx`
-      const pages = import.meta.glob("./Pages/**/*.jsx", { eager: true })
+      const page = `./pages/${name}.jsx`
+      const pages = import.meta.glob("./pages/**/*.jsx", { eager: true })
       return pages[page]
     },
     setup: ({ App, props }) => <App {...props} />,
@@ -557,8 +557,8 @@ When SSR is enabled, `hydrateRoot` should be used.
 
   createInertiaApp({
     resolve: (name) => {
-      const page = `./Pages/${name}.jsx`
-      const pages = import.meta.glob("./Pages/**/*.jsx", { eager: true })
+      const page = `./pages/${name}.jsx`
+      const pages = import.meta.glob("./pages/**/*.jsx", { eager: true })
       return pages[page]
     },
     setup({ el, App, props }) {
@@ -573,8 +573,8 @@ When SSR is enabled, `hydrateRoot` should be used.
 
 createInertiaApp({
   resolve: (name) => resolvePageComponent(
-    `./Pages/${name}.jsx`,
-    import.meta.glob('./Pages/**/*.jsx', { eager: true })
+    `./pages/${name}.jsx`,
+    import.meta.glob('./pages/**/*.jsx', { eager: true })
   ),
   setup({ el, App, props }) {
 
