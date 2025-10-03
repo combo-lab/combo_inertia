@@ -6,6 +6,10 @@ Before we begin, we need to choose the frontend framework to use. Here we'll use
 
 > Combo's project generator - [combo_new](https://github.com/combo-lab/combo_new), already includes all of this scaffolding and are the fastest way to get started with Combo and Inertia.
 
+## Compatibility
+
+`Inertia.js >= 2.0.0`
+
 ## Installation
 
 ### Generating a project using Vite
