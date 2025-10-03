@@ -33,7 +33,7 @@ defmodule Combo.Inertia.MixProject do
     combo =
       if System.get_env("USE_LOCAL_DEPS"),
         do: {:combo, path: "../combo", override: true},
-        else: {:combo, "~> 0.3"}
+        else: {:combo, "~> 0.4"}
 
     [
       combo,
@@ -64,7 +64,7 @@ defmodule Combo.Inertia.MixProject do
     [
       licenses: ["MIT"],
       links: %{
-        GitHub: @source_url,
+        Source: @source_url,
         Changelog: @changelog_url
       },
       files: ~w(
