@@ -32,22 +32,14 @@ defmodule Combo.Inertia.HTML do
 
   """
   @doc type: :component
-  attr :prefix, :string,
-    default: nil,
-    doc: "A prefix added before the content of `inner_block`."
-
-  attr :suffix, :string,
-    default: nil,
-    doc: "A suffix added after the content of `inner_block`."
-
   slot :inner_block,
     required: true,
     doc: "Content rendered inside the `title` tag."
 
   def inertia_title(assigns) do
     ~CE"""
-    <title data-prefix={@prefix} data-suffix={@suffix} inertia>
-      {@prefix}{render_slot(@inner_block)}{@suffix}
+    <title inertia>
+      {render_slot(@inner_block)}
     </title>
     """
   end
