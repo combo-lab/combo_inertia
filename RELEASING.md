@@ -1,6 +1,6 @@
-# Releasing
+# Release Instructions
 
-1. Update the `@version` variable in `mix.exs`
-2. Update the version under Installation in `README.md`
-3. Run `mix hex.publish`
-4. Tag an release on GitHub under the name `v#{@version}` 
+1. update `CHANGELOG.md`
+2. update the version in `mix.exs`
+3. run `mix check`
+4. run `mix publish`
