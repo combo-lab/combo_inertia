@@ -160,7 +160,6 @@ defmodule Combo.Inertia.Plug do
 
   defp external_redirect?(_conn), do: false
 
-  @default_version "1"
   defp compute_version(endpoint) do
     Cache.get(endpoint, :assets_version, fn -> {:ok, auto_detect_assets_version(endpoint)} end)
   end
@@ -171,11 +170,11 @@ defmodule Combo.Inertia.Plug do
         cond do
           hash = vite_manifest_hash(endpoint) -> hash
           hash = combo_static_manifest_hash(endpoint) -> hash
-          true -> @default_version
+          true -> "not-detected"
         end
 
       {module, fun, args} ->
-        apply(module, fun, args)
+        apply(module, fun, args) |> to_string()
 
       binary when is_binary(binary) ->
         binary

@@ -13,3 +13,7 @@ It's easy to add prefix and suffix into inner_block, like:
 ```
 
 Hence, these two attrs seems to unnecessary.
+
+### change the fallback version as `"not-detected"`
+
+Previously, it was `"1"`, which wasn't descriptive.
