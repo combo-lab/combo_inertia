@@ -89,7 +89,7 @@ Then:
 
 #### Modifying the root layout
 
-- add `ssr` attribute to the `<html>` tag, which is supplied to client-side code to identify the current rendering mode.
+- add `data-ssr` attribute to the `<html>` tag, which is supplied to client-side code to identify the current rendering mode.
 - replace the `<title>` tag with the `<.inertia_title>` component, which is used to keep the title in sync with client-side code.
 - add the `<.inertia_head>` component.
 
@@ -97,7 +97,7 @@ Then:
   # lib/my_app/web/layouts/root.html.ceex
   <!DOCTYPE html>
 - <html lang="en">
-+ <html lang="en" ssr={@inertia_ssr}>
++ <html lang="en" data-ssr={@inertia_ssr}>
     <head>
       <!-- ... -->
 -     <title>{assigns[:page_title]}</title>
@@ -570,7 +570,7 @@ When SSR is enabled, `hydrateRoot` should be used.
   axios.defaults.xsrfHeaderName = "x-csrf-token";
 
 + function ssr_mode() {
-+   return document.documentElement.hasAttribute("ssr");
++   return document.documentElement.hasAttribute("data-ssr");
 + }
 
   createInertiaApp({
