@@ -57,7 +57,7 @@ defmodule Combo.Inertia.HTML do
   # This <div> element serves as the mounting point for the JavaScript application.
   def csr_content(assigns) do
     ~CE"""
-    <div id="app" data-page={Combo.json_module().encode!(@page)}></div>
+    <div id="app" data-page={Combo.json_library().encode!(@page)}></div>
     """
   end
 
