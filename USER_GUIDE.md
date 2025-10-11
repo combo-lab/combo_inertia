@@ -103,8 +103,9 @@ Then:
 -     <title>{assigns[:page_title]}</title>
 +     <.inertia_title>{assigns[:page_title]}</.inertia_title>
 +     <.inertia_head content={@inertia_head} />
+-     <.vite_assets names={["src/css/app.css", "src/js/app.jsx"]} />
 +     <.vite_react_refresh />
-      <.vite_assets names={["src/js/app.jsx"]} />
++     <.vite_assets names={["src/js/app.jsx"]} />
     </head>
     <!-- ... -->
 ```
@@ -237,10 +238,10 @@ The `setup` callback receives everything necessary to initialize the client-side
 The above code assumes your pages live in the `assets/src/js/pages` directory and have a default export with page component, like this:
 
 ```javascript
-// assets/js/src/pages/Dashboard.jsx
+// assets/js/src/pages/Home.jsx
 
-export default Dashboard() {
-  return <div>{/* ... page contents ...*/}</div>
+export default Home({ msg }) {
+  return <p>This is the home page. {msg}</p>
 }
 ```
 
@@ -288,8 +289,8 @@ defmodule MyApp.Web.ProfileController do
 
   def index(conn, _params) do
     conn
-    |> inertia_put_prop(:text, "Hello world")
-    |> inertia_render("Welcome")
+    |> inertia_put_prop(:msg, "Hello world")
+    |> inertia_render("Home")
   end
 end
 ```
