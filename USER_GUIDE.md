@@ -197,7 +197,7 @@ Next, rename `app.js` to `app.jsx` and update it to create your Inertia app:
 
 ```javascript
 // assets/src/js/app.jsx
-
+import "vite/modulepreload-polyfill"
 import "@fontsource-variable/instrument-sans"
 import "../css/app.css"
 
@@ -256,6 +256,7 @@ But, Combo expects to receive the CSRF token via the `x-csrf-token` header, henc
 ```javascript
 // assets/src/js/app.jsx
 
+  import "vite/modulepreload-polyfill"
   import "@fontsource-variable/instrument-sans"
   import "../css/app.css"
 
@@ -559,6 +560,7 @@ Configure vite to build `assets/src/js/ssr.jsx`, and put the bundled `ssr.js` in
 When SSR is enabled, `hydrateRoot` should be used.
 
 ```diff
+  import "vite/modulepreload-polyfill"
   import "@fontsource-variable/instrument-sans"
   import "../css/app.css"
 
