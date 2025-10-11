@@ -629,6 +629,7 @@ Since `priv/ssr/` is for generated file, add it to your `.gitignore` file.
 ```diff
   # .gitignore
 
++ # Ignore files that are produced for SSR by assets build tools.
 + /priv/ssr/
 ```
 
