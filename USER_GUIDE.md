@@ -284,6 +284,185 @@ But, Combo expects to receive the CSRF token via the `x-csrf-token` header, henc
   })
 ```
 
+## Setting up SSR (optional)
+
+Inertia comes with with server-side rendering (SSR) support.
+
+> The steps for enabling SSR similar to other backend frameworks, but instead of running a separate Node.js server process to render HTML, `Combo.Inertia` spins up a pool of Node.js process workers to handle SSR calls and manages the state of those node processes from your Elixir process tree. This is mostly just an implementation detail that you don't need to be concerned about, but we'll highlight how our `ssr.js` script differs from the Inertia docs.
+
+> To run Combo and a Node.js process pool with 1 process, you need at least 512MiB of memory. Otherwise, the machine may experience out-of-memory (OOM) errors or severe slowness.
+
+### Client-side setup
+
+#### Adding the SSR entrypoint
+
+Create a Node.js module that exports a `render` function to perform the actual server-side rendering of pages. Let's name it `ssr.jsx`.
+
+```javascript
+// assets/src/js/ssr.jsx
+
+import { createInertiaApp } from "@inertiajs/react"
+import ReactDOMServer from "react-dom/server"
+
+export function render(page) {
+  return createInertiaApp({
+    page,
+    render: ReactDOMServer.renderToString,
+    resolve: (name) => {
+      const page = `./pages/${name}.jsx`
+      const pages = import.meta.glob("./pages/**/*.jsx", { eager: true })
+      return pages[page]
+    },
+    setup: ({ App, props }) => <App {...props} />,
+  })
+}
+```
+
+> This is similar to the server entry-point [documented here](https://inertiajs.com/server-side-rendering#add-server-entry-point), except we are simply exporting a function called `render`, instead of starting a Node.js server process.
+
+#### Configuring Vite for the SSR entrypoint
+
+Configure vite to build `assets/src/js/ssr.jsx`, and put the bundled `ssr.js` into `priv/ssr`.
+
+```diff
+  import { defineConfig } from "vite"
+  import combo from "vite-plugin-combo"
+  import react from "@vitejs/plugin-react"
+
+  export default defineConfig({
+    plugins: [
+      combo({
+        input: ["src/js/app.jsx"],
+        staticDir: "../priv/static",
++       ssrInput: ["src/js/ssr.jsx"],
++       ssrOutDir: "../priv/ssr",
+      }),
+      react(),
+    ],
+  })
+```
+
+#### Modifying the CSR entrypoint
+
+When SSR is enabled, `hydrateRoot` should be used.
+
+```diff
+  import "vite/modulepreload-polyfill"
+
+  import "@fontsource-variable/instrument-sans"
+  import "../css/app.css"
+
+  import { createInertiaApp } from "@inertiajs/react";
+  import { createRoot, hydrateRoot } from "react-dom/client";
+
+  import axios from "axios";
+  axios.defaults.xsrfHeaderName = "x-csrf-token";
+
++ function ssr_mode() {
++   return document.documentElement.hasAttribute("data-ssr");
++ }
+
+  createInertiaApp({
+    resolve: (name) => {
+      const page = `./pages/${name}.jsx`
+      const pages = import.meta.glob("./pages/**/*.jsx", { eager: true })
+      return pages[page]
+    },
+    setup({ el, App, props }) {
+-     createRoot(el).render(<App {...props} />)
++     if (ssr_mode()) {
++       hydrateRoot(el, <App {...props} />);
++     } else {
++       createRoot(el).render(<App {...props} />)
++     }
+    },
+  })
+```
+
+#### Updating npm script
+
+Update the `build` script in `package.json` to build the new `ssr.js` file.
+
+```diff
+ "scripts": {
+    "dev": "vite",
+-   "build": "vite build",
++   "build": "vite build && vite build --ssr",
+    // ...
+  },
+```
+
+Now you can build both your client-side and server-side bundles.
+
+```
+$ npm run build
+```
+
+#### Updating .gitignore
+
+Since `priv/ssr/` is for generated file, add it to your `.gitignore` file.
+
+```diff
+  # .gitignore
+
++ # Ignore files that are produced for SSR by assets build tools.
++ /priv/ssr/
+```
+
+### Server-side setup
+
+#### Setting up `Combo.Inertia.SSR`
+
+First, add the `Combo.Inertia.SSR` module to the of supervision tree:
+
+```elixir
+# lib/my_app/web/supervisor.ex
+
+defmodule MyApp.Web.Supervisor do
+  use Supervisor
+
+  @spec start_link(term()) :: Supervisor.on_start()
+  def start_link(arg) do
+    Supervisor.start_link(__MODULE__, arg, name: __MODULE__)
+  end
+
+  @impl Supervisor
+  def init(_arg) do
+    children =
+      Enum.concat(
+        inertia_children(),
+        [
+          MyApp.Web.Endpoint
+        ]
+      )
+
+    Supervisor.init(children, strategy: :one_for_one)
+  end
+
+  defp inertia_children do
+    config = Application.get_env(:my_app, MyApp.Web.Endpoint)
+    ssr? = get_in(config, [:inertia, :ssr])
+
+    if ssr? do
+      path = Path.join([Application.app_dir(:my_app), "priv/ssr"])
+      [{Combo.Inertia.SSR, endpoint: MyApp.Web.Endpoint, path: path}]
+    else
+      []
+    end
+  end
+end
+```
+
+Then, update your config to enable SSR for production environment:
+
+```elixir
+# config/prod.exs
+config :my_app, MyApp.Web.Endpoint,
+  inertia: [
+    ssr: true
+  ]
+```
+
 ## Rendering responses
 
 Rendering an Inertia response looks like this:
@@ -501,185 +680,6 @@ defmodule MyApp.Web.ConnCase do
     end
   end
 end
-```
-
-## Server-side rendering
-
-Inertia comes with with server-side rendering (SSR) support.
-
-> The steps for enabling SSR similar to other backend frameworks, but instead of running a separate Node.js server process to render HTML, `Combo.Inertia` spins up a pool of Node.js process workers to handle SSR calls and manages the state of those node processes from your Elixir process tree. This is mostly just an implementation detail that you don't need to be concerned about, but we'll highlight how our `ssr.js` script differs from the Inertia docs.
-
-> To run Combo and a Node.js process pool with 1 process, you need at least 512MiB of memory. Otherwise, the machine may experience out-of-memory (OOM) errors or severe slowness.
-
-### Client-side setup
-
-#### Adding the SSR entrypoint
-
-Create a Node.js module that exports a `render` function to perform the actual server-side rendering of pages. Let's name it `ssr.jsx`.
-
-```javascript
-// assets/src/js/ssr.jsx
-
-import { createInertiaApp } from "@inertiajs/react"
-import ReactDOMServer from "react-dom/server"
-
-export function render(page) {
-  return createInertiaApp({
-    page,
-    render: ReactDOMServer.renderToString,
-    resolve: (name) => {
-      const page = `./pages/${name}.jsx`
-      const pages = import.meta.glob("./pages/**/*.jsx", { eager: true })
-      return pages[page]
-    },
-    setup: ({ App, props }) => <App {...props} />,
-  })
-}
-```
-
-> This is similar to the server entry-point [documented here](https://inertiajs.com/server-side-rendering#add-server-entry-point), except we are simply exporting a function called `render`, instead of starting a Node.js server process.
-
-#### Configuring Vite for the SSR entrypoint
-
-Configure vite to build `assets/src/js/ssr.jsx`, and put the bundled `ssr.js` into `priv/ssr`.
-
-```diff
-  import { defineConfig } from "vite"
-  import combo from "vite-plugin-combo"
-  import react from "@vitejs/plugin-react"
-
-  export default defineConfig({
-    plugins: [
-      combo({
-        input: ["src/js/app.jsx"],
-        staticDir: "../priv/static",
-+       ssrInput: ["src/js/ssr.jsx"],
-+       ssrOutDir: "../priv/ssr",
-      }),
-      react(),
-    ],
-  })
-```
-
-#### Modifying the CSR entrypoint
-
-When SSR is enabled, `hydrateRoot` should be used.
-
-```diff
-  import "vite/modulepreload-polyfill"
-
-  import "@fontsource-variable/instrument-sans"
-  import "../css/app.css"
-
-  import { createInertiaApp } from "@inertiajs/react";
-  import { createRoot, hydrateRoot } from "react-dom/client";
-
-  import axios from "axios";
-  axios.defaults.xsrfHeaderName = "x-csrf-token";
-
-+ function ssr_mode() {
-+   return document.documentElement.hasAttribute("data-ssr");
-+ }
-
-  createInertiaApp({
-    resolve: (name) => {
-      const page = `./pages/${name}.jsx`
-      const pages = import.meta.glob("./pages/**/*.jsx", { eager: true })
-      return pages[page]
-    },
-    setup({ el, App, props }) {
--     createRoot(el).render(<App {...props} />)
-+     if (ssr_mode()) {
-+       hydrateRoot(el, <App {...props} />);
-+     } else {
-+       createRoot(el).render(<App {...props} />)
-+     }
-    },
-  })
-```
-
-#### Updating npm script
-
-Update the `build` script in `package.json` to build the new `ssr.js` file.
-
-```diff
- "scripts": {
-    "dev": "vite",
--   "build": "vite build",
-+   "build": "vite build && vite build --ssr",
-    // ...
-  },
-```
-
-Now you can build both your client-side and server-side bundles.
-
-```
-$ npm run build
-```
-
-#### Updating .gitignore
-
-Since `priv/ssr/` is for generated file, add it to your `.gitignore` file.
-
-```diff
-  # .gitignore
-
-+ # Ignore files that are produced for SSR by assets build tools.
-+ /priv/ssr/
-```
-
-### Server-side setup
-
-#### Setting up `Combo.Inertia.SSR`
-
-First, add the `Combo.Inertia.SSR` module to the of supervision tree:
-
-```elixir
-# lib/my_app/web/supervisor.ex
-
-defmodule MyApp.Web.Supervisor do
-  use Supervisor
-
-  @spec start_link(term()) :: Supervisor.on_start()
-  def start_link(arg) do
-    Supervisor.start_link(__MODULE__, arg, name: __MODULE__)
-  end
-
-  @impl Supervisor
-  def init(_arg) do
-    children =
-      Enum.concat(
-        inertia_children(),
-        [
-          MyApp.Web.Endpoint
-        ]
-      )
-
-    Supervisor.init(children, strategy: :one_for_one)
-  end
-
-  defp inertia_children do
-    config = Application.get_env(:my_app, MyApp.Web.Endpoint)
-    ssr? = get_in(config, [:inertia, :ssr])
-
-    if ssr? do
-      path = Path.join([Application.app_dir(:my_app), "priv/ssr"])
-      [{Combo.Inertia.SSR, endpoint: MyApp.Web.Endpoint, path: path}]
-    else
-      []
-    end
-  end
-end
-```
-
-Then, update your config to enable SSR for production environment:
-
-```elixir
-# config/prod.exs
-config :my_app, MyApp.Web.Endpoint,
-  inertia: [
-    ssr: true
-  ]
 ```
 
 ## Deployment
