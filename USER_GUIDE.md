@@ -300,7 +300,6 @@ Create a Node.js module that exports a `render` function to perform the actual s
 
 ```javascript
 // assets/src/js/ssr.jsx
-
 import { createInertiaApp } from "@inertiajs/react"
 import ReactDOMServer from "react-dom/server"
 
@@ -325,6 +324,7 @@ export function render(page) {
 Configure vite to build `assets/src/js/ssr.jsx`, and put the bundled `ssr.js` into `priv/ssr`.
 
 ```diff
+  // assets/vite.config.js
   import { defineConfig } from "vite"
   import combo from "vite-plugin-combo"
   import react from "@vitejs/plugin-react"
@@ -347,13 +347,15 @@ Configure vite to build `assets/src/js/ssr.jsx`, and put the bundled `ssr.js` in
 When SSR is enabled, `hydrateRoot` should be used.
 
 ```diff
+  // assets/src/js/app.jsx
   import "vite/modulepreload-polyfill"
 
   import "@fontsource-variable/instrument-sans"
   import "../css/app.css"
 
   import { createInertiaApp } from "@inertiajs/react";
-  import { createRoot, hydrateRoot } from "react-dom/client";
+- import { createRoot } from "react-dom/client";
++ import { createRoot, hydrateRoot } from "react-dom/client";
 
   import axios from "axios";
   axios.defaults.xsrfHeaderName = "x-csrf-token";
@@ -417,7 +419,6 @@ First, add the `Combo.Inertia.SSR` module to the of supervision tree:
 
 ```elixir
 # lib/my_app/web/supervisor.ex
-
 defmodule MyApp.Web.Supervisor do
   use Supervisor
 
