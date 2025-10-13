@@ -100,10 +100,14 @@ Then:
 + <html lang="en" data-ssr={@inertia_ssr}>
     <head>
       <!-- ... -->
--     <title>{assigns[:page_title]}</title>
-+     <.inertia_title>{assigns[:page_title]}</.inertia_title>
+-     <title>
+-       {if title = assigns[:page_title], do: "#{title} · MyApp", else: "MyApp"}
+-     </title>
++     <.inertia_title>
++       {if title = assigns[:page_title], do: "#{title} - MyApp", else: "MyApp"}
++     </.inertia_title>
 +     <.inertia_head content={@inertia_head} />
--     <.vite_assets names={["src/css/app.css", "src/js/app.jsx"]} />
+-     <.vite_assets names={["src/css/app.css", "src/js/app.js"]} />
 +     <.vite_react_refresh />
 +     <.vite_assets names={["src/js/app.jsx"]} />
     </head>
@@ -176,7 +180,7 @@ Edit `assets/vite.config.js`:
   export default defineConfig({
     plugins: [
       combo({
--       input: ["src/js/app.js"],
+-       input: ["src/css/app.css", "src/js/app.js"],
 +       input: ["src/js/app.jsx"],
         staticDir: "../priv/static",
       }),
@@ -199,6 +203,7 @@ Next, rename `app.js` to `app.jsx` and update it to create your Inertia app:
 ```javascript
 // assets/src/js/app.jsx
 import "vite/modulepreload-polyfill"
+
 import "@fontsource-variable/instrument-sans"
 import "../css/app.css"
 
@@ -254,10 +259,10 @@ If it's present, it will then include the token in an `X-XSRF-TOKEN` header for 
 
 But, Combo expects to receive the CSRF token via the `x-csrf-token` header, hence we need to configure Axios to use that header name:
 
-```javascript
-// assets/src/js/app.jsx
-
+```diff
+  // assets/src/js/app.jsx
   import "vite/modulepreload-polyfill"
+
   import "@fontsource-variable/instrument-sans"
   import "../css/app.css"
 
@@ -284,7 +289,7 @@ But, Combo expects to receive the CSRF token via the `x-csrf-token` header, henc
 Rendering an Inertia response looks like this:
 
 ```elixir
-defmodule MyApp.Web.ProfileController do
+defmodule MyApp.Web.PageController do
   use MyApp.Web, :controller
 
   def index(conn, _params) do
@@ -382,7 +387,7 @@ config :my_app, MyApp.Web.Endpoint
 To configure it on a per-request basis.
 
 ```elixir
-defmodule MyApp.Web.ProfileController do
+defmodule MyApp.Web.PageController do
   use MyApp.Web, :controller
 
   def index(conn, _params) do
@@ -562,12 +567,12 @@ When SSR is enabled, `hydrateRoot` should be used.
 
 ```diff
   import "vite/modulepreload-polyfill"
+
   import "@fontsource-variable/instrument-sans"
   import "../css/app.css"
 
   import { createInertiaApp } from "@inertiajs/react";
   import { createRoot, hydrateRoot } from "react-dom/client";
-  import { resolvePageComponent } from "./inertia-helper";
 
   import axios from "axios";
   axios.defaults.xsrfHeaderName = "x-csrf-token";
@@ -591,16 +596,6 @@ When SSR is enabled, `hydrateRoot` should be used.
 +     }
     },
   })
-
-createInertiaApp({
-  resolve: (name) => resolvePageComponent(
-    `./pages/${name}.jsx`,
-    import.meta.glob('./pages/**/*.jsx', { eager: true })
-  ),
-  setup({ el, App, props }) {
-
-  },
-});
 ```
 
 #### Updating npm script
