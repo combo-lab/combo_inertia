@@ -669,7 +669,7 @@ defmodule MyApp.Web.Supervisor do
 
     if ssr? do
       path = Path.join([Application.app_dir(:my_app), "priv/ssr"])
-      [{Combo.Inertia.SSR, path: path}]
+      [{Combo.Inertia.SSR, endpoint: MyApp.Web.Endpoint, path: path}]
     else
       []
     end

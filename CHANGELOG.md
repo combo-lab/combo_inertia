@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Add new required option - `:endpoint` to `Combo.Inertia.SSR`. It is for starting multiple SSR supervisors
+
+## v0.3.0
+
+Make it work with combo v0.5.0.
+
 ## v0.2.0
 
 ### remove `:prefix` and `:suffix` attr from `<Inertia.HTML.inertia_title>` component

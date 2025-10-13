@@ -556,13 +556,13 @@ defmodule Combo.Inertia.Conn do
 
   defp send_response(conn) do
     if conn.private[:inertia_ssr] do
-      case SSR.call(build_page_object(conn)) do
+      endpoint = endpoint_module!(conn)
+
+      case SSR.call(endpoint, build_page_object(conn)) do
         {:ok, %{"head" => head, "body" => body}} ->
           send_ssr_response(conn, head, body)
 
         {:error, message} ->
-          endpoint = endpoint_module!(conn)
-
           if raise_on_ssr_failure?(endpoint) do
             raise RenderError, message: message
           else

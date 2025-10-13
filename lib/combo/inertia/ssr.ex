@@ -1,8 +1,9 @@
 defmodule Combo.Inertia.SSR do
   @moduledoc """
-  A supervisor that provides SSR support for Inertia views. This module is
-  responsible for starting a pool of Node.js processes that can run the SSR
-  rendering function for your application.
+  The supervisor that provides SSR support for Inertia views.
+
+  This module is responsible for starting a pool of Node.js processes that
+  can run the SSR rendering function for your application.
   """
 
   use Supervisor
@@ -13,44 +14,49 @@ defmodule Combo.Inertia.SSR do
   @default_module "ssr"
 
   @doc """
-  Starts the SSR supervisor and accompanying Node.js workers.
+  Starts the Node.js supervisor and workers for SSR.
 
   ## Options
 
-  - `:path` - (required) the path to the directory where your `ssr.js` file lives.
+  - `:endpoint` - (required) the Combo endpoint.
+  - `:path` - (required) the path to the directory where the Node.js module file lives.
   - `:module` - (optional) the name of the Node.js module file. Defaults to "#{@default_module}".
   - `:pool_size` - (optional) the number of Node.js workers. Defaults to #{@default_pool_size}.
+
   """
   def start_link(init_arg) do
-    Supervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
+    endpoint = Keyword.fetch!(init_arg, :endpoint)
+    path = Keyword.fetch!(init_arg, :path)
+    module = Keyword.get(init_arg, :module, @default_module)
+    pool_size = Keyword.get(init_arg, :pool_size, @default_pool_size)
+
+    supervisor_name = supervisor_name(endpoint)
+
+    :persistent_term.put({supervisor_name, :module}, module)
+
+    init_arg = [
+      name: supervisor_name,
+      pool_size: pool_size,
+      path: path,
+      module: module
+    ]
+
+    Supervisor.start_link(__MODULE__, init_arg, name: supervisor_name)
   end
 
   @impl true
-  @doc false
   def init(opts) do
-    path = Keyword.fetch!(opts, :path)
-    module = Keyword.get(opts, :module, @default_module)
-    pool_size = Keyword.get(opts, :pool_size, @default_pool_size)
-
-    supervisor_name = supervisor_name()
-    :persistent_term.put({supervisor_name, :module}, module)
-
-    children = [
-      {NodeJS.Supervisor, name: supervisor_name, path: path, pool_size: pool_size}
-    ]
-
-    Supervisor.init(children, strategy: :one_for_one)
+    NodeJS.Supervisor.init(opts)
   end
 
   @doc false
-  def call(page) do
-    supervisor_name = supervisor_name()
+  def call(endpoint, page) do
+    supervisor_name = supervisor_name(endpoint)
     module = :persistent_term.get({supervisor_name, :module})
-
     NodeJS.call({module, :render}, [page], name: supervisor_name, binary: true)
   end
 
-  defp supervisor_name do
-    Module.concat(__MODULE__, Supervisor)
+  defp supervisor_name(endpoint) do
+    Module.concat(endpoint, InertiaSSR.Supervisor)
   end
 end
