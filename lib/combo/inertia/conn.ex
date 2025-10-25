@@ -228,7 +228,7 @@ defmodule Combo.Inertia.Conn do
   to use when traversing errors. See [`Ecto.Changeset.traverse_errors/2`](https://hexdocs.pm/ecto/Ecto.Changeset.html#traverse_errors/2)
   for more information about the message function.
 
-      defp default_msg_func({msg, opts}) do
+      defp default_msg_fun({msg, opts}) do
         Enum.reduce(opts, msg, fn {key, value}, acc ->
           String.replace(acc, "%{\#{key}}", fn _ -> to_string(value) end)
         end)
@@ -255,8 +255,6 @@ defmodule Combo.Inertia.Conn do
 
   """
   @spec inertia_put_errors(Plug.Conn.t(), data :: term()) :: Plug.Conn.t()
-  @spec inertia_put_errors(Plug.Conn.t(), data :: term(), msg_func :: function()) ::
-          Plug.Conn.t()
   def inertia_put_errors(conn, data) do
     errors =
       data
@@ -267,10 +265,11 @@ defmodule Combo.Inertia.Conn do
     inertia_put_prop(conn, :errors, errors)
   end
 
-  def inertia_put_errors(conn, data, msg_func) do
+  @spec inertia_put_errors(Plug.Conn.t(), data :: term(), msg_fun :: function()) :: Plug.Conn.t()
+  def inertia_put_errors(conn, data, msg_fun) do
     errors =
       data
-      |> Errors.to_errors(msg_func)
+      |> Errors.to_errors(msg_fun)
       |> bag_errors(conn)
       |> inertia_always()
 

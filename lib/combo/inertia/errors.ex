@@ -65,7 +65,7 @@ defprotocol Combo.Inertia.Errors do
       }
     end
 
-    def to_errors(validation_error, _msg_func) do
+    def to_errors(validation_error, _msg_fun) do
       # Custom implementation with message function
       to_errors(validation_error)
     end
@@ -74,19 +74,19 @@ defprotocol Combo.Inertia.Errors do
   """
 
   @spec to_errors(term()) :: map() | no_return()
-  @spec to_errors(term(), msg_func :: function()) :: map() | no_return()
+  @spec to_errors(term(), msg_fun :: function()) :: map() | no_return()
   def to_errors(value)
-  def to_errors(value, msg_func)
+  def to_errors(value, msg_fun)
 end
 
 defimpl Combo.Inertia.Errors, for: Ecto.Changeset do
   def to_errors(%Ecto.Changeset{} = changeset) do
-    to_errors(changeset, &default_msg_func/1)
+    to_errors(changeset, &default_msg_fun/1)
   end
 
-  def to_errors(%Ecto.Changeset{} = changeset, msg_func) do
+  def to_errors(%Ecto.Changeset{} = changeset, msg_fun) do
     changeset
-    |> Ecto.Changeset.traverse_errors(msg_func)
+    |> Ecto.Changeset.traverse_errors(msg_fun)
     |> process_changeset_errors()
     |> Map.new()
   end
@@ -122,7 +122,7 @@ defimpl Combo.Inertia.Errors, for: Ecto.Changeset do
   end
 
   # The default message function to call when traversing Ecto errors
-  defp default_msg_func({msg, opts}) do
+  defp default_msg_fun({msg, opts}) do
     Enum.reduce(opts, msg, fn {key, value}, acc ->
       String.replace(acc, "%{#{key}}", fn _ -> to_string(value) end)
     end)
@@ -134,7 +134,7 @@ defimpl Combo.Inertia.Errors, for: Map do
     validate_error_map!(value)
   end
 
-  def to_errors(value, _msg_func) do
+  def to_errors(value, _msg_fun) do
     validate_error_map!(value)
   end
 
