@@ -650,7 +650,7 @@ def update(conn, params) do
 
     {:error, changeset} ->
       conn
-      |> assign_errors(changeset)
+      |> inertia_put_errors(changeset)
       |> redirect(to: ~p"/settings")
   end
 end
