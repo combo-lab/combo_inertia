@@ -252,12 +252,16 @@ export default Home({ msg }) {
 
 #### Setting up CSRF protection
 
-Axios is the HTTP library that Inertia uses under the hood. Axios automatically checks for the existence of an `XSRF-TOKEN` cookie.
-If it's present, it will then include the token in an `X-XSRF-TOKEN` header for any requests it makes.
+`Combo.Inertia` sets the CSRF token to `CSRF-TOKEN` cookie, and `Combo` expects to receive the CSRF token via the `X-CSRF-TOKEN` header
 
-`Combo.Inertia` automatically sets the `XSRF-TOKEN` cookie used by the Axios.
+But, Axios, the HTTP library that Inertia uses under the hood, uses the following CSRF related config by default:
 
-But, Combo expects to receive the CSRF token via the `x-csrf-token` header, hence we need to configure Axios to use that header name:
+```
+axios.defaults.xsrfCookieName = "XSRF-TOKEN"
+axios.defaults.xsrfHeaderName = "X-XSRF-TOKEN"
+```
+
+To make them work together, we should setup Axios:
 
 ```diff
   // assets/src/js/app.jsx
@@ -270,7 +274,8 @@ But, Combo expects to receive the CSRF token via the `x-csrf-token` header, henc
   import { createRoot } from "react-dom/client"
 
 + import axios from "axios"
-+ axios.defaults.xsrfHeaderName = "x-csrf-token"
++ axios.defaults.xsrfCookieName = "CSRF-TOKEN"
++ axios.defaults.xsrfHeaderName = "X-CSRF-TOKEN"
 
   createInertiaApp({
     resolve: (name) => {
