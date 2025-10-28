@@ -270,10 +270,10 @@ To make them work together, we should setup Axios:
   import "@fontsource-variable/instrument-sans"
   import "../css/app.css"
 
++ import axios from "axios"
   import { createInertiaApp } from "@inertiajs/react"
   import { createRoot } from "react-dom/client"
 
-+ import axios from "axios"
 + axios.defaults.xsrfCookieName = "CSRF-TOKEN"
 + axios.defaults.xsrfHeaderName = "X-CSRF-TOKEN"
 
@@ -358,12 +358,13 @@ When SSR is enabled, `hydrateRoot` should be used.
   import "@fontsource-variable/instrument-sans"
   import "../css/app.css"
 
+  import axios from "axios";
   import { createInertiaApp } from "@inertiajs/react";
 - import { createRoot } from "react-dom/client";
 + import { createRoot, hydrateRoot } from "react-dom/client";
 
-  import axios from "axios";
-  axios.defaults.xsrfHeaderName = "x-csrf-token";
+  axios.defaults.xsrfCookieName = "CSRF-TOKEN"
+  axios.defaults.xsrfHeaderName = "X-CSRF-TOKEN"
 
 + function ssr_mode() {
 +   return document.documentElement.hasAttribute("data-ssr");
