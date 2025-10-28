@@ -1,7 +1,7 @@
 defmodule Combo.Inertia.MixProject do
   use Mix.Project
 
-  @version "0.3.0"
+  @version "0.4.0"
   @description "Provides Inertia integration for Combo."
   @source_url "https://github.com/combo-lab/combo_inertia"
   @changelog_url "https://github.com/combo-lab/combo_inertia/blob/v#{@version}/CHANGELOG.md"

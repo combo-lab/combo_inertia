@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.4.0
+
 - Add new required option - `:endpoint` to `Combo.Inertia.SSR`. It is for starting multiple SSR supervisors
 - Change cookie name from `XSRF-TOKEN` to `CSRF-TOKEN`, and you should configure Axios like:
 
