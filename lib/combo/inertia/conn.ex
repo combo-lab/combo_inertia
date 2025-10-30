@@ -607,7 +607,7 @@ defmodule Combo.Inertia.Conn do
     %{
       component: conn.private.inertia_page.component,
       props: conn.private.inertia_page.props,
-      url: request_path(conn),
+      url: request_relative_url(conn),
       version: conn.private.inertia_version,
       encryptHistory: conn.private.inertia_encrypt_history,
       clearHistory: conn.private.inertia_clear_history
@@ -648,12 +648,12 @@ defmodule Combo.Inertia.Conn do
     end
   end
 
-  defp request_path(conn) do
-    IO.iodata_to_binary([conn.request_path, request_url_qs(conn.query_string)])
+  defp request_relative_url(conn) do
+    IO.iodata_to_binary([conn.request_path, request_qs(conn.query_string)])
   end
 
-  defp request_url_qs(""), do: ""
-  defp request_url_qs(qs), do: [??, qs]
+  defp request_qs(""), do: ""
+  defp request_qs(qs), do: [??, qs]
 
   defp put_csrf_cookie(conn) do
     put_resp_cookie(conn, "CSRF-TOKEN", get_csrf_token(), http_only: false)
