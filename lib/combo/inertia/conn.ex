@@ -649,11 +649,11 @@ defmodule Combo.Inertia.Conn do
   end
 
   defp request_relative_url(conn) do
-    IO.iodata_to_binary([conn.request_path, request_qs(conn.query_string)])
+    IO.iodata_to_binary([conn.request_path, request_search(conn.query_string)])
   end
 
-  defp request_qs(""), do: ""
-  defp request_qs(qs), do: [??, qs]
+  defp request_search(""), do: ""
+  defp request_search(query_string), do: [??, query_string]
 
   defp put_csrf_cookie(conn) do
     put_resp_cookie(conn, "CSRF-TOKEN", get_csrf_token(), http_only: false)
