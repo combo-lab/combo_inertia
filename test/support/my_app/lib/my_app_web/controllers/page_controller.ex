@@ -158,7 +158,7 @@ defmodule MyApp.Web.PageController do
     conn
     |> assign(:page_title, "Home")
     |> inertia_put_prop(:first_name, "Bob")
-    |> inertia_put_prop(:items, inertia_defer(fn -> [%{item_name: "Foo"}] end))
+    |> inertia_put_prop(:deferred_items, inertia_defer(fn -> [%{item_name: "Foo"}] end))
     |> inertia_camelize_props()
     |> inertia_render("Home")
   end
