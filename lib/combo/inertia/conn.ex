@@ -351,7 +351,7 @@ defmodule Combo.Inertia.Conn do
 
     props = Map.merge(shared_props, props)
     {props, merge_props, deep_merge_props} = resolve_merge_props(props, opts)
-    {props, deferred_props} = resolve_deferred_props(props)
+    {props, deferred_props} = resolve_deferred_props(props, opts)
 
     props =
       props
@@ -437,14 +437,19 @@ defmodule Combo.Inertia.Conn do
     end)
   end
 
-  defp resolve_deferred_props(props) do
+  defp resolve_deferred_props(props, opts) do
     Enum.reduce(props, {[], %{}}, fn {key, value}, {props, keys} ->
       case value do
         {:defer, {fun, group}} ->
+          transformed_key =
+            key
+            |> transform_key(opts)
+            |> to_string()
+
           keys =
             case Map.get(keys, group) do
-              [_ | _] = group_keys -> Map.put(keys, group, [key | group_keys])
-              _ -> Map.put(keys, group, [key])
+              [_ | _] = group_keys -> Map.put(keys, group, [transformed_key | group_keys])
+              _ -> Map.put(keys, group, [transformed_key])
             end
 
           {[{key, {:optional, fun}} | props], keys}
