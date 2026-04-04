@@ -15,6 +15,17 @@ defmodule Combo.Inertia.Conn do
 
   @title_regex ~r/<title inertia>(.*?)<\/title>/
 
+  defmodule Once do
+    @moduledoc false
+    @type t :: %__MODULE__{
+            fun: fun() | tuple(),
+            key: String.t() | nil,
+            expires_at: integer() | nil,
+            fresh: boolean()
+          }
+    defstruct [:fun, :key, :expires_at, :fresh]
+  end
+
   @type component :: String.t()
 
   @type raw_prop_key :: atom() | String.t()
@@ -30,6 +41,7 @@ defmodule Combo.Inertia.Conn do
   @opaque merge :: {:merge, any()}
   @opaque deep_merge :: {:deep_merge, any()}
   @opaque defer :: {:defer, {fun(), String.t()}}
+  @opaque once :: Once.t()
   @opaque preserved_prop_key :: {:preserve, raw_prop_key()}
 
   @doc """
@@ -85,6 +97,76 @@ defmodule Combo.Inertia.Conn do
   """
   @spec inertia_always(value :: any()) :: always()
   def inertia_always(value), do: {:always, value}
+
+  @doc """
+  Marks a prop as a "once" prop, which is cached on the client-side and
+  reused on subsequent pages that include the same prop.
+
+  ## Options
+
+  - `:fresh` - When `true`, forces the prop to be refreshed ignoring the client cache.
+    Also accepts a boolean condition. Defaults to `false`.
+  - `:until` - Sets an expiration time. Accepts a `DateTime` or integer seconds from now.
+  - `:as` - Custom key for sharing data across pages with different prop names.
+
+  ## Examples
+
+      # Basic once prop
+      inertia_put_prop(conn, :plans, inertia_once(fn -> Plan.all() end))
+
+      # Force refresh
+      inertia_put_prop(conn, :plans, inertia_once(fn -> Plan.all() end, fresh: true))
+
+      # With expiration (1 hour)
+      inertia_put_prop(conn, :rates, inertia_once(fn -> ExchangeRate.all() end, until: 3600))
+
+      # With custom key for sharing across pages
+      inertia_put_prop(conn, :member_roles, inertia_once(fn -> Role.all() end, as: "roles"))
+
+      # Combined options
+      inertia_put_prop(conn, :plans, inertia_once(fn -> Plan.all() end,
+        fresh: should_refresh?,
+        until: DateTime.utc_now() |> DateTime.add(1, :day),
+        as: "billing_plans"
+      ))
+
+      # Combining with other prop types
+      inertia_put_prop(conn, :permissions, inertia_once(inertia_defer(fn -> Permission.all() end)))
+  """
+  @doc since: "2.6.0"
+  @spec inertia_once(fun_or_tagged :: fun() | defer() | merge() | deep_merge() | optional()) ::
+          once()
+  @spec inertia_once(
+          fun_or_tagged :: fun() | defer() | merge() | deep_merge() | optional(),
+          opts :: keyword()
+        ) :: once()
+  def inertia_once(fun, opts \\ [])
+
+  def inertia_once(fun, opts) when is_function(fun) do
+    %Once{
+      fun: fun,
+      key: Keyword.get(opts, :as),
+      expires_at: parse_expiration(Keyword.get(opts, :until)),
+      fresh: Keyword.get(opts, :fresh, false)
+    }
+  end
+
+  def inertia_once({tag, _} = tagged, opts)
+      when tag in [:defer, :optional, :merge, :deep_merge] do
+    %Once{
+      fun: tagged,
+      key: Keyword.get(opts, :as),
+      expires_at: parse_expiration(Keyword.get(opts, :until)),
+      fresh: Keyword.get(opts, :fresh, false)
+    }
+  end
+
+  defp parse_expiration(nil), do: nil
+  defp parse_expiration(%DateTime{} = dt), do: DateTime.to_unix(dt, :millisecond)
+
+  defp parse_expiration(seconds) when is_integer(seconds) do
+    DateTime.utc_now() |> DateTime.add(seconds, :second) |> DateTime.to_unix(:millisecond)
+  end
 
   ## Deffered props
 
@@ -346,10 +428,14 @@ defmodule Combo.Inertia.Conn do
     except = if is_partial, do: conn.private[:inertia_partial_except], else: []
     camelize_props = conn.private[:inertia_camelize_props]
     reset = conn.private[:inertia_reset] || []
+    except_once_props = conn.private[:inertia_except_once_props] || []
 
     opts = Keyword.merge(opts, camelize_props: camelize_props, reset: reset)
 
     props = Map.merge(shared_props, props)
+    # Process once props first to unwrap %Once{} and expose any nested tags
+    # (like {:defer, ...} or {:merge, ...}) for subsequent resolution
+    {props, once_props} = resolve_once_props(props, except_once_props, only, opts)
     {props, merge_props, deep_merge_props} = resolve_merge_props(props, opts)
     {props, deferred_props} = resolve_deferred_props(props, opts)
 
@@ -366,6 +452,7 @@ defmodule Combo.Inertia.Conn do
       merge_props: merge_props,
       deep_merge_props: deep_merge_props,
       deferred_props: deferred_props,
+      once_props: once_props,
       is_partial: is_partial
     })
     |> detect_ssr(opts)
@@ -456,6 +543,45 @@ defmodule Combo.Inertia.Conn do
 
         _ ->
           {[{key, value} | props], keys}
+      end
+    end)
+  end
+
+  defp resolve_once_props(props, except_once_props, only, opts) do
+    Enum.reduce(props, {[], %{}}, fn {key, value}, {props_acc, once_acc} ->
+      case value do
+        %Once{} = once ->
+          transformed_key =
+            key
+            |> transform_key(opts)
+            |> to_string()
+
+          once_key = once.key || transformed_key
+
+          # Determine if we should skip resolution:
+          # - The key is in except_once_props (client already has it)
+          # - The prop is not marked as fresh
+          # - The prop is not explicitly requested in a partial reload
+          skip =
+            once_key in except_once_props and
+              not once.fresh and
+              transformed_key not in only
+
+          once_meta = %{
+            "prop" => transformed_key,
+            "expiresAt" => once.expires_at
+          }
+
+          if skip do
+            # Skip this prop entirely, but keep metadata
+            {props_acc, Map.put(once_acc, once_key, once_meta)}
+          else
+            # Include prop for resolution
+            {[{key, once.fun} | props_acc], Map.put(once_acc, once_key, once_meta)}
+          end
+
+        _ ->
+          {[{key, value} | props_acc], once_acc}
       end
     end)
   end
@@ -620,6 +746,7 @@ defmodule Combo.Inertia.Conn do
     |> maybe_put_merge_props(conn)
     |> maybe_put_deep_merge_props(conn)
     |> maybe_put_deferred_props(conn)
+    |> maybe_put_once_props(conn)
   end
 
   defp maybe_put_merge_props(assigns, conn) do
@@ -650,6 +777,16 @@ defmodule Combo.Inertia.Conn do
       assigns
     else
       Map.put(assigns, :deferredProps, deferred_props)
+    end
+  end
+
+  defp maybe_put_once_props(assigns, conn) do
+    once_props = conn.private.inertia_page.once_props
+
+    if Enum.empty?(once_props) do
+      assigns
+    else
+      Map.put(assigns, :onceProps, once_props)
     end
   end
 
