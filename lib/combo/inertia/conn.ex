@@ -99,8 +99,8 @@ defmodule Combo.Inertia.Conn do
   def inertia_always(value), do: {:always, value}
 
   @doc """
-  Marks a prop as a "once" prop, which is cached on the client-side and
-  reused on subsequent pages that include the same prop.
+  Marks a prop as "once", which is cached on the client-side and reused on
+  subsequent pages that include the same prop.
 
   ## Options
 
@@ -114,11 +114,20 @@ defmodule Combo.Inertia.Conn do
       # Basic once prop
       inertia_put_prop(conn, :plans, inertia_once(fn -> Plan.all() end))
 
-      # Force refresh
+      # Forcing a refresh
       inertia_put_prop(conn, :plans, inertia_once(fn -> Plan.all() end, fresh: true))
 
-      # With expiration (1 hour)
-      inertia_put_prop(conn, :rates, inertia_once(fn -> ExchangeRate.all() end, until: 3600))
+      # Expires in 1 hour
+      inertia_put_prop(conn, :rates, inertia_once(
+        fn -> ExchangeRate.current() end,
+        until: 3600
+      ))
+
+      # Expires at a specific time
+      inertia_put_prop(conn, :rates, inertia_once(
+        fn -> ExchangeRate.current() end,
+        until: DateTime.utc_now() |> DateTime.add(1, :day)
+      ))
 
       # With custom key for sharing across pages
       inertia_put_prop(conn, :member_roles, inertia_once(fn -> Role.all() end, as: "roles"))
@@ -132,8 +141,8 @@ defmodule Combo.Inertia.Conn do
 
       # Combining with other prop types
       inertia_put_prop(conn, :permissions, inertia_once(inertia_defer(fn -> Permission.all() end)))
+
   """
-  @doc since: "2.6.0"
   @spec inertia_once(fun_or_tagged :: fun() | defer() | merge() | deep_merge() | optional()) ::
           once()
   @spec inertia_once(
