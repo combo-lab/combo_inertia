@@ -23,13 +23,13 @@ defprotocol Combo.Inertia.Errors do
     case Posts.create(post_params)
       # Handle successful validation
       {:ok, post} ->
-        redirect(conn, to: ~p"/posts/#{post}")
+        redirect(conn, to: "/posts/#{post}")
 
       # Convert changeset errors and share them with Inertia
       {:error, changeset} ->
         conn
         |> inertia_put_errors(changeset)
-        |> redirect(conn, to: ~p"/posts/new")
+        |> redirect(conn, to: "/posts/new")
     end
   end
   ```

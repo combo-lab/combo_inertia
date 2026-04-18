@@ -656,12 +656,12 @@ def update(conn, params) do
     {:ok, _settings} ->
       conn
       |> put_flash(:info, "Settings updated")
-      |> redirect(to: ~p"/settings")
+      |> redirect(to: "/settings")
 
     {:error, changeset} ->
       conn
       |> inertia_put_errors(changeset)
-      |> redirect(to: ~p"/settings")
+      |> redirect(to: "/settings")
   end
 end
 ```
@@ -692,12 +692,12 @@ def update(conn, params) do
     {:ok, _settings} ->
       conn
       |> put_flash(:info, "Settings updated")
-      |> redirect(to: ~p"/settings")
+      |> redirect(to: "/settings")
 
     {:error, changeset} ->
       conn
       |> inertia_put_errors(changeset)
-      |> redirect(to: ~p"/settings")
+      |> redirect(to: "/settings")
   end
 end
 ```

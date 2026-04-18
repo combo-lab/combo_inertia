@@ -22,8 +22,6 @@ defmodule MyApp.Web.ConnCase do
       # The default endpoint for testing
       @endpoint MyApp.Web.Endpoint
 
-      use MyApp.Web, :verified_routes
-
       # Import conveniences for testing with connections
       import Plug.Conn
       import Combo.ConnTest

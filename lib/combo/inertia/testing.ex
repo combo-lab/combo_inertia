@@ -63,7 +63,7 @@ defmodule Combo.Inertia.Testing do
           conn = post("/users", %{"name" => ""})
 
           assert %{user: %{id: 1}} = inertia_props(conn)
-          assert redirected_to(conn) == ~p"/users"
+          assert redirected_to(conn) == "/users"
           assert inertia_errors(conn) == %{"name" => "can't be blank"}
         end
       end

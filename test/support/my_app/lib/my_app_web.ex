@@ -40,7 +40,7 @@ defmodule MyApp.Web do
       import Combo.Conn
       import Combo.Inertia.Conn
 
-      unquote(verified_routes())
+      unquote(route_helpers())
     end
   end
 
@@ -54,6 +54,7 @@ defmodule MyApp.Web do
         ]
 
       unquote(html_helpers())
+      unquote(route_helpers())
     end
   end
 
@@ -61,18 +62,14 @@ defmodule MyApp.Web do
     quote do
       use Combo.HTML
 
+      alias MyApp.Web.Layouts
       import Combo.Inertia.HTML
-
-      unquote(verified_routes())
     end
   end
 
-  def verified_routes do
+  def route_helpers do
     quote do
-      use Combo.VerifiedRoutes,
-        endpoint: MyApp.Web.Endpoint,
-        router: MyApp.Web.Router,
-        statics: MyApp.Web.static_paths()
+      alias MyApp.Web.Router.Helpers, as: Routes
     end
   end
 end

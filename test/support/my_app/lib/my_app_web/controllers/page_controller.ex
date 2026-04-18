@@ -67,7 +67,7 @@ defmodule MyApp.Web.PageController do
 
     conn
     |> inertia_put_errors(changeset)
-    |> redirect(to: ~p"/")
+    |> redirect(to: "/")
   end
 
   def bad_error_map(conn, _params) do

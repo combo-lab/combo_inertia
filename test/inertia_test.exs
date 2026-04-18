@@ -31,7 +31,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/")
+      |> get("/")
 
     assert %{
              "component" => "Home",
@@ -48,7 +48,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/shared")
+      |> get("/shared")
 
     assert %{
              "component" => "Home",
@@ -66,7 +66,7 @@ defmodule InertiaTest do
   test "renders HTML without x-inertia", %{conn: conn} do
     conn =
       conn
-      |> get(~p"/")
+      |> get("/")
 
     body = html_response(conn, 200)
 
@@ -77,7 +77,7 @@ defmodule InertiaTest do
   test "tags the <title> tag with inertia", %{conn: conn} do
     conn =
       conn
-      |> get(~p"/")
+      |> get("/")
 
     body = html_response(conn, 200)
 
@@ -96,7 +96,7 @@ defmodule InertiaTest do
 
     conn =
       conn
-      |> get(~p"/")
+      |> get("/")
 
     body = html_response(conn, 200)
 
@@ -117,7 +117,7 @@ defmodule InertiaTest do
 
     conn =
       conn
-      |> get(~p"/local_ssr")
+      |> get("/local_ssr")
 
     body = html_response(conn, 200)
 
@@ -138,7 +138,7 @@ defmodule InertiaTest do
 
     conn =
       conn
-      |> get(~p"/binary_props")
+      |> get("/binary_props")
 
     body = html_response(conn, 200)
 
@@ -163,7 +163,7 @@ defmodule InertiaTest do
 
     conn =
       conn
-      |> get(~p"/")
+      |> get("/")
 
     body = html_response(conn, 200)
     assert body =~ ~s("component":"Home") |> html_escape()
@@ -184,7 +184,7 @@ defmodule InertiaTest do
 
     assert_raise(Combo.Inertia.SSR.RenderError, fn ->
       conn
-      |> get(~p"/")
+      |> get("/")
     end)
   end
 
@@ -193,7 +193,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> put(~p"/")
+      |> put("/")
 
     assert response(conn, 303)
   end
@@ -203,7 +203,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> patch(~p"/")
+      |> patch("/")
 
     assert response(conn, 303)
   end
@@ -213,7 +213,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> delete(~p"/")
+      |> delete("/")
 
     assert response(conn, 303)
   end
@@ -223,7 +223,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", "different")
-      |> get(~p"/")
+      |> get("/")
 
     assert html_response(conn, 409)
     refute get_resp_header(conn, "x-inertia") == ["true"]
@@ -237,7 +237,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia-version", @current_version)
       # Allows us to make sure the "unwrapping" in `resolve_merge_props` doesn't affect optional props.
       |> put_req_header("x-inertia-reset", "a")
-      |> get(~p"/lazy")
+      |> get("/lazy")
 
     assert %{
              "component" => "Home",
@@ -260,7 +260,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia-version", @current_version)
       |> put_req_header("x-inertia-partial-component", "Home")
       |> put_req_header("x-inertia-partial-data", "b")
-      |> get(~p"/always")
+      |> get("/always")
 
     assert json_response(conn, 200) == %{
              "component" => "Home",
@@ -279,7 +279,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia-version", @current_version)
       |> put_req_header("x-inertia-partial-component", "Home")
       |> put_req_header("x-inertia-partial-except", "b")
-      |> get(~p"/always")
+      |> get("/always")
 
     assert json_response(conn, 200) == %{
              "component" => "Home",
@@ -298,7 +298,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia-version", @current_version)
       |> put_req_header("x-inertia-partial-component", "Home")
       |> put_req_header("x-inertia-partial-data", "a")
-      |> get(~p"/always")
+      |> get("/always")
 
     assert json_response(conn, 200) == %{
              "component" => "Home",
@@ -317,7 +317,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia-version", @current_version)
       |> put_req_header("x-inertia-partial-component", "NonMatchingComponent")
       |> put_req_header("x-inertia-partial-data", "a")
-      |> get(~p"/always")
+      |> get("/always")
 
     assert json_response(conn, 200) == %{
              "component" => "Home",
@@ -340,7 +340,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/tagged_lazy")
+      |> get("/tagged_lazy")
 
     assert json_response(conn, 200) == %{
              "component" => "Home",
@@ -359,7 +359,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia-version", @current_version)
       |> put_req_header("x-inertia-partial-component", "Home")
       |> put_req_header("x-inertia-partial-data", "a")
-      |> get(~p"/tagged_lazy")
+      |> get("/tagged_lazy")
 
     assert json_response(conn, 200) == %{
              "component" => "Home",
@@ -376,7 +376,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/changeset_errors")
+      |> get("/changeset_errors")
 
     assert json_response(conn, 200) == %{
              "component" => "Home",
@@ -397,7 +397,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-error-bag", "groceries")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/changeset_errors")
+      |> get("/changeset_errors")
 
     assert json_response(conn, 200) == %{
              "component" => "Home",
@@ -423,22 +423,22 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-error-bag", "groceries")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/redirect_on_error")
+      |> get("/redirect_on_error")
 
-    assert redirected_to(conn) == ~p"/"
+    assert redirected_to(conn) == "/"
 
     # The next request should have the errors carried over
-    conn = get(conn, ~p"/")
+    conn = get(conn, "/")
     assert html_response(conn, 200) =~ ~s("errors":{"groceries") |> html_escape()
 
     # Subsequent requests should now have the errors
-    conn = get(conn, ~p"/")
+    conn = get(conn, "/")
     assert html_response(conn, 200) =~ ~s("errors":{}) |> html_escape()
   end
 
   test "validates error maps", %{conn: conn} do
     assert_raise ArgumentError, ~s(expected string value for name, got ["is required"]), fn ->
-      get(conn, ~p"/bad_error_map")
+      get(conn, "/bad_error_map")
     end
   end
 
@@ -447,7 +447,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/external_redirect")
+      |> get("/external_redirect")
 
     assert html_response(conn, 409)
     refute get_resp_header(conn, "x-inertia") == ["true"]
@@ -459,7 +459,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> put(~p"/external_redirect")
+      |> put("/external_redirect")
 
     assert html_response(conn, 409)
     refute get_resp_header(conn, "x-inertia") == ["true"]
@@ -471,7 +471,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> patch(~p"/external_redirect")
+      |> patch("/external_redirect")
 
     assert html_response(conn, 409)
     refute get_resp_header(conn, "x-inertia") == ["true"]
@@ -483,7 +483,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> delete(~p"/external_redirect")
+      |> delete("/external_redirect")
 
     assert html_response(conn, 409)
     refute get_resp_header(conn, "x-inertia") == ["true"]
@@ -493,7 +493,7 @@ defmodule InertiaTest do
   test "automatically includes flash in props", %{conn: conn} do
     conn =
       conn
-      |> patch(~p"/")
+      |> patch("/")
 
     assert html_response(conn, 302)
 
@@ -508,7 +508,7 @@ defmodule InertiaTest do
   test "does not clobber the flash prop if manually set", %{conn: conn} do
     conn =
       conn
-      |> get(~p"/overridden_flash")
+      |> get("/overridden_flash")
 
     assert html_response(conn, 200) =~ ~s("flash":{"foo":"bar") |> html_escape()
   end
@@ -516,7 +516,7 @@ defmodule InertiaTest do
   test "forwards flash across forced refreshes", %{conn: conn} do
     conn =
       conn
-      |> patch(~p"/")
+      |> patch("/")
 
     assert html_response(conn, 302)
 
@@ -543,7 +543,7 @@ defmodule InertiaTest do
   test "includes CSRF-TOKEN cookie", %{conn: conn} do
     conn =
       conn
-      |> get(~p"/")
+      |> get("/")
 
     assert html_response(conn, 200)
     assert %{"CSRF-TOKEN" => %{value: "" <> _, http_only: false}} = conn.resp_cookies
@@ -554,7 +554,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/nested")
+      |> get("/nested")
 
     assert %{"props" => %{"a" => %{"b" => %{"e" => %{"h" => %{}}}}}} = json_response(conn, 200)
   end
@@ -564,7 +564,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/struct_props")
+      |> get("/struct_props")
 
     assert %{"props" => %{"now" => "2024-07-04T00:00:00Z"}} = json_response(conn, 200)
   end
@@ -574,7 +574,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/merge_props")
+      |> get("/merge_props")
 
     assert %{
              "component" => "Home",
@@ -594,7 +594,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
       |> put_req_header("x-inertia-reset", "a")
-      |> get(~p"/merge_props")
+      |> get("/merge_props")
 
     assert %{
              "component" => "Home",
@@ -611,7 +611,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/deep_merge_props")
+      |> get("/deep_merge_props")
 
     assert %{
              "component" => "Home",
@@ -639,7 +639,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
       |> put_req_header("x-inertia-reset", "a")
-      |> get(~p"/deep_merge_props")
+      |> get("/deep_merge_props")
 
     assert %{
              "component" => "Home",
@@ -662,7 +662,7 @@ defmodule InertiaTest do
   test "processes deferred props on initial page load", %{conn: conn} do
     conn =
       conn
-      |> get(~p"/deferred_props")
+      |> get("/deferred_props")
 
     body = html_response(conn, 200)
     props = extract_page_data_from_html(body)
@@ -678,7 +678,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia-version", @current_version)
       # Allows us to make sure the "unwrapping" in `resolve_merge_props` doesn't affect deferred props.
       |> put_req_header("x-inertia-reset", "a")
-      |> get(~p"/deferred_props")
+      |> get("/deferred_props")
 
     body = json_response(conn, 200)
 
@@ -702,7 +702,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia-version", @current_version)
       |> put_req_header("x-inertia-partial-component", "Home")
       |> put_req_header("x-inertia-partial-data", "a,b,c")
-      |> get(~p"/deferred_props")
+      |> get("/deferred_props")
 
     body = json_response(conn, 200)
 
@@ -723,7 +723,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/encrypted_history")
+      |> get("/encrypted_history")
 
     assert %{
              "component" => "Home",
@@ -740,7 +740,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/cleared_history")
+      |> get("/cleared_history")
 
     assert %{
              "component" => "Home",
@@ -757,7 +757,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/camelized_props")
+      |> get("/camelized_props")
 
     assert %{
              "component" => "Home",
@@ -779,7 +779,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia-partial-data", "deferredItems")
       |> put_req_header("x-inertia-partial-component", "Home")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/camelized_deferred_props")
+      |> get("/camelized_deferred_props")
 
     assert %{
              "component" => "Home",
@@ -796,7 +796,7 @@ defmodule InertiaTest do
   test "camelizes keys in deferredProps metadata on initial page load", %{conn: conn} do
     conn =
       conn
-      |> get(~p"/camelized_deferred_props")
+      |> get("/camelized_deferred_props")
 
     body = html_response(conn, 200)
     props = extract_page_data_from_html(body)
@@ -809,7 +809,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/preserved_case_props")
+      |> get("/preserved_case_props")
 
     assert %{
              "component" => "Home",
@@ -830,7 +830,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/force_redirect")
+      |> get("/force_redirect")
 
     assert html_response(conn, 409)
     refute get_resp_header(conn, "x-inertia") == ["true"]
@@ -842,7 +842,7 @@ defmodule InertiaTest do
   test "includes once props on initial page load", %{conn: conn} do
     conn =
       conn
-      |> get(~p"/once_props")
+      |> get("/once_props")
 
     body = html_response(conn, 200)
     props = extract_page_data_from_html(body)
@@ -860,7 +860,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/once_props")
+      |> get("/once_props")
 
     body = json_response(conn, 200)
 
@@ -878,7 +878,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
       |> put_req_header("x-inertia-except-once-props", "plans")
-      |> get(~p"/once_props")
+      |> get("/once_props")
 
     body = json_response(conn, 200)
 
@@ -897,7 +897,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
       |> put_req_header("x-inertia-except-once-props", "plans")
-      |> get(~p"/once_props_fresh")
+      |> get("/once_props_fresh")
 
     body = json_response(conn, 200)
 
@@ -917,7 +917,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia-partial-component", "Home")
       |> put_req_header("x-inertia-partial-data", "plans")
       |> put_req_header("x-inertia-except-once-props", "plans")
-      |> get(~p"/once_props")
+      |> get("/once_props")
 
     body = json_response(conn, 200)
 
@@ -930,7 +930,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/once_props_with_expiration")
+      |> get("/once_props_with_expiration")
 
     body = json_response(conn, 200)
 
@@ -953,7 +953,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/once_props_with_custom_key")
+      |> get("/once_props_with_custom_key")
 
     body = json_response(conn, 200)
 
@@ -972,7 +972,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
       |> put_req_header("x-inertia-except-once-props", "roles")
-      |> get(~p"/once_props_with_custom_key")
+      |> get("/once_props_with_custom_key")
 
     body = json_response(conn, 200)
 
@@ -989,7 +989,7 @@ defmodule InertiaTest do
       conn
       |> put_req_header("x-inertia", "true")
       |> put_req_header("x-inertia-version", @current_version)
-      |> get(~p"/once_props_camelized")
+      |> get("/once_props_camelized")
 
     body = json_response(conn, 200)
 
@@ -1003,7 +1003,7 @@ defmodule InertiaTest do
   test "handles once prop combined with deferred", %{conn: conn} do
     conn =
       conn
-      |> get(~p"/once_props_with_deferred")
+      |> get("/once_props_with_deferred")
 
     body = html_response(conn, 200)
     props = extract_page_data_from_html(body)
@@ -1027,7 +1027,7 @@ defmodule InertiaTest do
       |> put_req_header("x-inertia-version", @current_version)
       |> put_req_header("x-inertia-partial-component", "Home")
       |> put_req_header("x-inertia-partial-data", "permissions")
-      |> get(~p"/once_props_with_deferred")
+      |> get("/once_props_with_deferred")
 
     body = json_response(conn, 200)
 
