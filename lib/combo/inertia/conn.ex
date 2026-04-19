@@ -367,6 +367,10 @@ defmodule Combo.Inertia.Conn do
     inertia_put_prop(conn, :errors, errors)
   end
 
+  defp bag_errors(errors, _conn) when errors == %{} do
+    errors
+  end
+
   defp bag_errors(errors, conn) do
     if error_bag = conn.private[:inertia_error_bag] do
       %{error_bag => errors}
