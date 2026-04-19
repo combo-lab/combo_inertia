@@ -595,7 +595,7 @@ defmodule Combo.Inertia.Conn do
     end)
   end
 
-  defp apply_filters(props, only, _except, opts) when length(only) > 0 do
+  defp apply_filters(props, [_ | _] = only, _except, opts) do
     props
     |> Enum.filter(fn {key, value} ->
       case value do
@@ -614,7 +614,7 @@ defmodule Combo.Inertia.Conn do
     |> Map.new()
   end
 
-  defp apply_filters(props, _only, except, opts) when length(except) > 0 do
+  defp apply_filters(props, _only, [_ | _] = except, opts) do
     props
     |> Enum.filter(fn {key, value} ->
       case value do
