@@ -276,7 +276,7 @@ defmodule Combo.Inertia.Conn do
   ## History encryption
 
   @doc """
-  Instucts the client-side to encrypt the current page's data before pushing
+  Instructs the client-side to encrypt the current page's data before pushing
   it to the history state.
   """
   @spec inertia_encrypt_history(Plug.Conn.t()) :: Plug.Conn.t()
@@ -290,7 +290,7 @@ defmodule Combo.Inertia.Conn do
   end
 
   @doc """
-  Instucts the client-side to clear the history state.
+  Instructs the client-side to clear the history state.
   """
   @spec inertia_clear_history(Plug.Conn.t()) :: Plug.Conn.t()
   def inertia_clear_history(conn) do
