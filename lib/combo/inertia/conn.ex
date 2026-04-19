@@ -9,8 +9,8 @@ defmodule Combo.Inertia.Conn do
   import Combo.Conn
 
   alias Combo.Inertia.Errors
-  alias Combo.Inertia.SSR.RenderError
   alias Combo.Inertia.SSR
+  alias Combo.Inertia.SSR.RenderError
   alias Combo.Inertia.Config
 
   @title_regex ~r/<title inertia>(.*?)<\/title>/
