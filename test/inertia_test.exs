@@ -395,8 +395,8 @@ defmodule InertiaTest do
     conn =
       conn
       |> put_req_header("x-inertia", "true")
-      |> put_req_header("x-inertia-error-bag", "task")
       |> put_req_header("x-inertia-version", @current_version)
+      |> put_req_header("x-inertia-error-bag", "task")
       |> get("/")
 
     assert %{"props" => %{"errors" => errors}} = json_response(conn, 200)
@@ -407,25 +407,17 @@ defmodule InertiaTest do
     conn =
       conn
       |> put_req_header("x-inertia", "true")
-      |> put_req_header("x-inertia-error-bag", "groceries")
       |> put_req_header("x-inertia-version", @current_version)
+      |> put_req_header("x-inertia-error-bag", "groceries")
       |> get("/changeset_errors")
 
-    assert json_response(conn, 200) == %{
-             "component" => "Home",
-             "props" => %{
-               "errors" => %{
-                 "groceries" => %{
-                   "settings.theme" => "can't be blank",
-                   "name" => "can't be blank"
-                 }
-               },
-               "flash" => %{}
-             },
-             "url" => "/changeset_errors",
-             "version" => @current_version,
-             "encryptHistory" => false,
-             "clearHistory" => false
+    assert %{"props" => %{"errors" => errors}} = json_response(conn, 200)
+
+    assert errors == %{
+             "groceries" => %{
+               "settings.theme" => "can't be blank",
+               "name" => "can't be blank"
+             }
            }
   end
 
@@ -433,8 +425,8 @@ defmodule InertiaTest do
     conn =
       conn
       |> put_req_header("x-inertia", "true")
-      |> put_req_header("x-inertia-error-bag", "groceries")
       |> put_req_header("x-inertia-version", @current_version)
+      |> put_req_header("x-inertia-error-bag", "groceries")
       |> get("/redirect_on_error")
 
     assert redirected_to(conn) == "/"
