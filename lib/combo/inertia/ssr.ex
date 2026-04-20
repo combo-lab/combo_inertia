@@ -8,8 +8,6 @@ defmodule Combo.Inertia.SSR do
 
   use Supervisor
 
-  require Logger
-
   @default_pool_size 4
   @default_module "ssr"
 
