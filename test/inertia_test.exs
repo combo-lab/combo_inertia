@@ -15,6 +15,8 @@ defmodule InertiaTest do
   setup do
     # Disable SSR by default, selectively enable it when testing
     put_config(:ssr, false)
+    # Reset history config that may be leaked by install tests
+    Application.delete_env(:inertia, :history)
     :ok
   end
 
