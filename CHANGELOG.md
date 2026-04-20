@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## v2.0.0
+
+- Add support for scroll props
 
 ## v0.4.0
 
