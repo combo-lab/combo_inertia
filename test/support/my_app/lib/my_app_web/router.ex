@@ -12,7 +12,7 @@ defmodule MyApp.Web.Router do
   end
 
   scope "/", MyApp.Web do
-    pipe_through(:browser)
+    pipe_through :browser
 
     get "/", PageController, :index
     get "/non_inertia", PageController, :non_inertia
@@ -44,6 +44,12 @@ defmodule MyApp.Web.Router do
     get "/once_props_with_custom_key", PageController, :once_props_with_custom_key
     get "/once_props_camelized", PageController, :once_props_camelized
     get "/once_props_with_deferred", PageController, :once_props_with_deferred
+    get "/scroll_props", PageController, :scroll_props
+    get "/scroll_props_with_custom_wrapper", PageController, :scroll_props_with_custom_wrapper
+    get "/scroll_props_with_custom_page_name", PageController, :scroll_props_with_custom_page_name
+    get "/scroll_props_lazy", PageController, :scroll_props_lazy
+    get "/scroll_props_camelized", PageController, :scroll_props_camelized
+    get "/scroll_props_with_custom_metadata", PageController, :scroll_props_with_custom_metadata
     put "/", PageController, :update
     patch "/", PageController, :patch
     delete "/", PageController, :delete

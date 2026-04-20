@@ -247,6 +247,99 @@ defmodule MyApp.Web.PageController do
     |> inertia_render("Home")
   end
 
+  def scroll_props(conn, _params) do
+    conn
+    |> assign(:page_title, "Home")
+    |> inertia_put_prop(
+      :users,
+      inertia_scroll(%{
+        data: [%{id: 1, name: "Alice"}, %{id: 2, name: "Bob"}],
+        meta: %{current_page: 1, previous_page: nil, next_page: 2, page_name: "page"}
+      })
+    )
+    |> inertia_put_prop(:regular, "value")
+    |> inertia_render("Home")
+  end
+
+  def scroll_props_with_custom_wrapper(conn, _params) do
+    conn
+    |> assign(:page_title, "Home")
+    |> inertia_put_prop(
+      :users,
+      inertia_scroll(
+        %{
+          items: [%{id: 1, name: "Alice"}],
+          meta: %{current_page: 1, previous_page: nil, next_page: 2}
+        },
+        wrapper: "items"
+      )
+    )
+    |> inertia_render("Home")
+  end
+
+  def scroll_props_with_custom_page_name(conn, _params) do
+    conn
+    |> assign(:page_title, "Home")
+    |> inertia_put_prop(
+      :users,
+      inertia_scroll(
+        %{
+          data: [%{id: 1}],
+          meta: %{current_page: 1}
+        },
+        page_name: "users_page"
+      )
+    )
+    |> inertia_render("Home")
+  end
+
+  def scroll_props_lazy(conn, _params) do
+    conn
+    |> assign(:page_title, "Home")
+    |> inertia_put_prop(
+      :users,
+      inertia_scroll(fn ->
+        %{
+          data: [%{id: 1}],
+          meta: %{current_page: 1, previous_page: nil, next_page: nil, page_name: "page"}
+        }
+      end)
+    )
+    |> inertia_render("Home")
+  end
+
+  def scroll_props_camelized(conn, _params) do
+    conn
+    |> assign(:page_title, "Home")
+    |> inertia_put_prop(
+      :user_list,
+      inertia_scroll(%{
+        data: [%{id: 1}],
+        meta: %{current_page: 1, previous_page: nil, next_page: 2}
+      })
+    )
+    |> inertia_camelize_props()
+    |> inertia_render("Home")
+  end
+
+  def scroll_props_with_custom_metadata(conn, _params) do
+    conn
+    |> assign(:page_title, "Home")
+    |> inertia_put_prop(
+      :users,
+      inertia_scroll(
+        %{
+          entries: [%{id: 1}]
+        },
+        wrapper: "entries",
+        metadata: fn _data ->
+          %{page_name: "p", current_page: 5, previous_page: 4, next_page: 6}
+        end
+      )
+    )
+    |> inertia_render("Home")
+  end
+
   defp lazy_3 do
     "lazy_3"
   end

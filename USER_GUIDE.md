@@ -585,6 +585,11 @@ Anywhere this plug is used, the serialized `user` prop will be passed to the Ine
 
 - `Combo.Inertia.Conn.inertia_once/1`
 
+## Scroll props
+
+- `Combo.Inertia.Conn.inertia_scroll/1`
+- `Combo.Inertia.Conn.inertia_scroll/2`
+
 ## History encryption
 
 ### Global encryption

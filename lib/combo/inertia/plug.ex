@@ -72,6 +72,7 @@ defmodule Combo.Inertia.Plug do
         |> detect_partial_reload()
         |> detect_reset()
         |> detect_except_once_props()
+        |> detect_scroll_merge_intent()
         |> convert_redirects()
         |> check_version()
 
@@ -117,6 +118,16 @@ defmodule Combo.Inertia.Plug do
       end
 
     put_private(conn, :inertia_except_once_props, except_once)
+  end
+
+  defp detect_scroll_merge_intent(conn) do
+    intent =
+      case get_req_header(conn, "x-inertia-infinite-scroll-merge-intent") do
+        [intent] when intent in ["append", "prepend"] -> intent
+        _ -> "append"
+      end
+
+    put_private(conn, :inertia_scroll_merge_intent, intent)
   end
 
   defp get_partial_only(conn) do
