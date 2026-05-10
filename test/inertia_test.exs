@@ -171,6 +171,28 @@ defmodule InertiaTest do
     assert body =~ ~s("component":"Home") |> html_escape()
   end
 
+  @tag :capture_log
+  test "falls back to CSR if SSR worker crashes with non-string error", %{conn: conn} do
+    path =
+      __ENV__.file
+      |> Path.dirname()
+      |> Path.join("js")
+
+    start_supervised(
+      {Combo.Inertia.SSR, endpoint: MyApp.Web.Endpoint, path: path, module: "ssr-crash"}
+    )
+
+    put_config(:ssr, true)
+    put_config(:raise_on_ssr_failure, false)
+
+    conn =
+      conn
+      |> get("/")
+
+    body = html_response(conn, 200)
+    assert body =~ ~s("component":"Home") |> html_escape()
+  end
+
   test "raises on SSR failure when failure mode is set to raise", %{conn: conn} do
     path =
       __ENV__.file
